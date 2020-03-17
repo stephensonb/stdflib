@@ -9,14 +9,8 @@ namespace STDFConsole
         {
             string path = "C:\\Users\\brste\\source\\repos\\STDFDemo\\a595.stdf";
 
-            STDFReader reader = new STDFReader(path);
-            STDFRecord record;
-
-            while(!reader.EOF)
-            {
-                record = reader.ReadRecord();
-                Console.WriteLine(string.Format("Record type: {0:x2}  Record Subtype: {1:x2}", record.REC_TYP, record.REC_SUB));
-            }
+            STDFFileV4 newFile = new STDFFileV4();
+            newFile.ReadFile(path);
         }
     }
 }

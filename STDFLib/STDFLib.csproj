@@ -1,7 +1,17 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Serialization\BitField2Serializer.cs" />
+    <Compile Remove="Serialization\BitFieldSerializer.cs" />
+    <Compile Remove="Serialization\NibbleSerializer.cs" />
+    <Compile Remove="Serialization\VarDataSerializer.cs" />
+    <Compile Remove="STDFDataReader_archive.cs" />
+    <Compile Remove="STDFDataStream.cs" />
+    <Compile Remove="Types\ByteArray.cs" />
+  </ItemGroup>
 
 </Project>

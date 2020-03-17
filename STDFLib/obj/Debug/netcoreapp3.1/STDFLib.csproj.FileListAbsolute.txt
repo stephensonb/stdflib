@@ -6,3 +6,9 @@ C:\Users\brste\source\repos\STDFDemo\STDFLib\obj\Debug\netcoreapp3.1\STDFLib.Ass
 C:\Users\brste\source\repos\STDFDemo\STDFLib\obj\Debug\netcoreapp3.1\STDFLib.dll
 C:\Users\brste\source\repos\STDFDemo\STDFLib\obj\Debug\netcoreapp3.1\STDFLib.pdb
 C:\Users\brste\source\repos\STDFDemo\STDFLib\obj\Debug\netcoreapp3.1\STDFLib.csprojAssemblyReference.cache
+D:\code\source\repos\stdflib\STDFLib\obj\Debug\netcoreapp3.1\STDFLib.csprojAssemblyReference.cache
+D:\code\source\repos\stdflib\STDFLib\obj\Debug\netcoreapp3.1\STDFLib.csproj.CoreCompileInputs.cache
+D:\code\source\repos\stdflib\STDFLib\obj\Debug\netcoreapp3.1\STDFLib.AssemblyInfoInputs.cache
+D:\code\source\repos\stdflib\STDFLib\obj\Debug\netcoreapp3.1\STDFLib.AssemblyInfo.cs
+D:\code\source\repos\stdflib\STDFLib\obj\Debug\netcoreapp3.1\STDFLib.dll
+D:\code\source\repos\stdflib\STDFLib\obj\Debug\netcoreapp3.1\STDFLib.pdb

@@ -12,3 +12,9 @@ C:\Users\brste\source\repos\STDFDemo\STDFConsole\obj\Debug\netcoreapp3.1\STDFCon
 C:\Users\brste\source\repos\STDFDemo\STDFConsole\obj\Debug\netcoreapp3.1\STDFConsole.csproj.CopyComplete
 C:\Users\brste\source\repos\STDFDemo\STDFConsole\obj\Debug\netcoreapp3.1\STDFConsole.dll
 C:\Users\brste\source\repos\STDFDemo\STDFConsole\obj\Debug\netcoreapp3.1\STDFConsole.pdb
+D:\code\source\repos\stdflib\STDFConsole\obj\Debug\netcoreapp3.1\STDFConsole.csprojAssemblyReference.cache
+D:\code\source\repos\stdflib\STDFConsole\obj\Debug\netcoreapp3.1\STDFConsole.csproj.CoreCompileInputs.cache
+D:\code\source\repos\stdflib\STDFConsole\obj\Debug\netcoreapp3.1\STDFConsole.AssemblyInfoInputs.cache
+D:\code\source\repos\stdflib\STDFConsole\obj\Debug\netcoreapp3.1\STDFConsole.AssemblyInfo.cs
+D:\code\source\repos\stdflib\STDFConsole\obj\Debug\netcoreapp3.1\STDFConsole.dll
+D:\code\source\repos\stdflib\STDFConsole\obj\Debug\netcoreapp3.1\STDFConsole.pdb

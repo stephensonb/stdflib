@@ -1,51 +1,10 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
+using System.Text;
 
 namespace STDFLib
 {
-    public interface ISTDFRecord
-    {
-        uint REC_LEN { get; }
-        byte REC_TYP { get; }
-        byte REC_SUB { get; }    
-    }
-
-    public class STDFRecord : ISTDFRecord
-    {
-        private RecordType typeCode { get; set; } = 0x0000;
-        private byte[] buffer;
-        public uint REC_LEN { get; private set; }
-        public byte REC_TYP { get => typeCode.REC_TYP; }
-        public byte REC_SUB { get => typeCode.REC_SUB; }
-        public string Description { get; private set; } = "Unknown record type";
-
-        public STDFRecord(RecordType recType, byte[] buffer)
-        {
-            typeCode = recType;
-            this.buffer = buffer;
-        }
-
-        public override string ToString()
-        {
-            using (StringWriter sw = new StringWriter()) 
-            {
-                sw.WriteLine("=========================================================");
-                sw.WriteLine(" Record Type: {0:2x}   Record Subtype: {1:2x}  Length: {2:5d}", REC_TYP, REC_SUB, REC_LEN);
-                sw.WriteLine(" Record Description: {0}", Description);
-                sw.WriteLine("=========================================================");
-                
-                foreach(var prop in this.GetType().GetProperties())
-                {
-                
-                }
-
-                sw.Flush();
-                return sw.ToString();
-            } 
-        }
-    }
-
     public enum SeekDirection 
     {
         Next,
@@ -66,14 +25,6 @@ namespace STDFLib
         {
             return new RecordType() { TypeCode = (ushort)v };
         }
-    }
-
-    public class STDFile
-    {
-        long currentPosition = 0;
-        public long seekRecord(SeekDirection dir) { return currentPosition; }
-        public long seekFile(SeekDirection dir) { return currentPosition; }
-        public long seekRecordType(SeekDirection dir) { return currentPosition; }
     }
 
     public enum Endianness
@@ -171,14 +122,14 @@ namespace STDFLib
         }
     }
 
-    public class STDFReader
+    public class STDFReader : IDisposable
     {
-        FileStream fs = null;
-        ushort currentRecordLength;
-        public int CPU_TYPE { get; private set; }
-        public int STDF_VER { get; private set; }
-
-        private ByteConverter Converter;
+        private readonly FileStream fs = null;
+        private readonly ByteConverter Converter;
+        public STDFCpuTypes CPU_TYPE { get; private set; }
+        public STDFVersions STDF_VER { get; private set; }
+        public ushort CurrentRecordLength { get; private set; }
+        public RecordType CurrentRecordType { get; private set; }
 
         public bool EOF
         {
@@ -194,30 +145,21 @@ namespace STDFLib
             fs = new FileStream(path, FileMode.Open, FileAccess.Read);
             Rewind();
 
-            // First record must be a FAR record type
-            if (CurrentRecordType.TypeCode == 10)
+            // Check that the current record being pointed to is the FAR record type
+            if (CurrentRecordType.TypeCode == (ushort)RecordTypes.FAR)
             {
-                if (currentRecordLength == 512)
+                if (CurrentRecordLength == 512)
                 {
+                    // FAR record Length should be 2.  If 512, then file was created with BigEndian byte order.
+                    // Configure the byte converter to use BigEndian byte ordering for int/float/doubles.
                     Converter.SetEndianness(Endianness.BigEndian);
                 }
-                CPU_TYPE = fs.ReadByte();
-                STDF_VER = fs.ReadByte();
             } else
             {
                 throw new FormatException("Invalid STDF format.");
             }
-
-            ReadHeader();
-        }
-
-        public ISTDFRecord ReadRecord()
-        {
-            byte[] buffer = new byte[currentRecordLength];
-            fs.Read(buffer, 0, currentRecordLength);
-            STDFRecord record = new STDFRecord(CurrentRecordType, buffer);
-            ReadHeader();
-            return record;
+            CPU_TYPE = (STDFCpuTypes)fs.ReadByte();
+            STDF_VER = (STDFVersions)fs.ReadByte();
         }
 
         public void Rewind()
@@ -230,7 +172,7 @@ namespace STDFLib
         {
             byte[] buffer = new byte[4];
             fs.Read(buffer, 0, 4);
-            currentRecordLength = Converter.ToUInt16(buffer, 0);
+            CurrentRecordLength = Converter.ToUInt16(buffer, 0);
             CurrentRecordType = (ushort)(buffer[2] << 8 | buffer[3]);
         }
 
@@ -261,7 +203,7 @@ namespace STDFLib
 
             try
             {
-                fs.Seek(currentRecordLength+2, SeekOrigin.Current);
+                fs.Seek(CurrentRecordLength+2, SeekOrigin.Current);
             } catch(EndOfStreamException e)
             {
                 fs.Seek(0, SeekOrigin.End);
@@ -281,7 +223,238 @@ namespace STDFLib
             }
         }
 
-        public RecordType CurrentRecordType { get; private set; }
+        public int ReadByte()
+        {
+            if (!EOF)
+            {
+                return fs.ReadByte();
+            }
+
+            throw new EndOfStreamException();
+        }
+
+        public virtual object[] Read(Type dataType, int itemCount = 0, int itemDataLength = int.MinValue)
+        {
+            // Create an array of the specified elementType and size of itemCount
+            object[] values = (object[])Array.CreateInstance(dataType, itemCount);
+
+            // Fill the array
+            for (int i = 0; i < itemCount; i++)
+            {
+                values[i] = Read(dataType, itemDataLength);
+            }
+
+            return values;
+        }
+
+        public short ReadInt16()
+        {
+            byte[] buffer = new byte[2];
+            fs.Read(buffer, 0, 2);
+            return Converter.ToInt16(buffer);
+        }
+
+        public ushort ReadUInt16()
+        {
+            byte[] buffer = new byte[2];
+            fs.Read(buffer, 0, 2);
+            return Converter.ToUInt16(buffer);
+        }
+
+        public int ReadInt32()
+        {
+            byte[] buffer = new byte[4];
+            fs.Read(buffer, 0, 4);
+            return Converter.ToInt32(buffer);
+        }
+
+        public uint ReadUInt32()
+        {
+            byte[] buffer = new byte[4];
+            fs.Read(buffer, 0, 4);
+            return Converter.ToUInt32(buffer);
+        }
+
+        public long ReadInt64()
+        {
+            byte[] buffer = new byte[8];
+            fs.Read(buffer, 0, 8);
+            return Converter.ToInt64(buffer);
+        }
+
+        public ulong ReadUInt64()
+        {
+            byte[] buffer = new byte[8];
+            fs.Read(buffer, 0, 8);
+            return Converter.ToUInt64(buffer);
+        }
+
+        public float ReadSingle()
+        {
+            byte[] buffer = new byte[4];
+            fs.Read(buffer, 0, 4);
+            return Converter.ToFloat(buffer);
+        }
+
+        public double ReadDouble()
+        {
+            byte[] buffer = new byte[8];
+            fs.Read(buffer, 0, 8);
+            return Converter.ToDouble(buffer);
+        }
+
+        public DateTime ReadDateTime()
+        {
+            uint date = ReadUInt32();
+            return DateTime.UnixEpoch.AddSeconds(date);
+        }
+
+        public char[] ReadString(int length) 
+        {
+            if (length == 0) return new char[] { };
+            byte[] buffer = new byte[length];
+            fs.Read(buffer, 0, length);
+            char[] ca = new char[length];
+            Encoding.Convert(Encoding.ASCII, Encoding.Default, buffer).CopyTo(ca,0);
+            return ca;
+        }
+
+        public byte[] ReadBytes(int length)
+        {
+            if (length == 0)
+            {
+                return new byte[] { };
+            }
+
+            byte[] buffer = new byte[length];
+            fs.Read(buffer, 0, length);
+            return buffer;
+        }
+
+        public virtual object Read(Type dataType, int dataLength = int.MinValue)
+        {
+            switch (dataType.Name)
+            {
+                case "Byte": return (byte)ReadByte();
+                case "SByte": return (sbyte)ReadByte();
+                case "Int16": return ReadInt16();
+                case "Int32": return ReadInt32();
+                case "UInt16": return ReadUInt16();
+                case "UInt32": return ReadUInt32();
+                case "Single": return ReadSingle();
+                case "Double": return ReadDouble();
+                case "DateTime": return ReadDateTime();
+                case "Char[]":
+                case "String":
+                    if (dataLength < 0)
+                    {
+                        // Assume 1st byte has length of array to read
+                        dataLength = ReadByte();
+                    }
+                    if (dataType.Name == "String")
+                    {
+                        return ReadString(dataLength).ToString();
+                    }
+                    return ReadString(dataLength);
+                case "BitField": return ReadBitField();
+                case "BitField2": return ReadBitField2();
+                case "Nibbles": return ReadNibbles(1);
+                case "Byte[]":
+                    if (dataLength < 0)
+                    {
+                        dataLength = ReadByte();
+                    }
+                    return ReadBytes(dataLength);
+            }
+
+            return null;
+        }
+
+        // Read in an array of nibbles from the stream.
+        public Nibbles ReadNibbles(int nibbleCount = 1)
+        {
+            Nibbles nArray = new Nibbles();
+
+            if (nibbleCount > 0)
+            {
+                // number of bytes to read are nibble count / 2 + 1.  Each byte contains two nibbles
+                nArray.AddRange(ReadBytes(nibbleCount / 2 + 1));
+            }
+
+            return nArray;
+        }
+
+        // Reads a number of bytes (length specified by first byte) into a bitfield.  Length byte is the number of bytes to read.
+        public BitField ReadBitField()
+        {
+            BitField b = new BitField();
+            
+            // number of bytes to read for the bitfield
+            int byteCount = ReadByte();
+
+            if (byteCount == 0) return null; // If zero, then return, nothing else to read.
+
+            // read the bytes into the bitfield
+            b.SetBits(ReadBytes(byteCount));
+
+            return b;
+        }
+
+        // Reads a number of bits into the bitfield.  The number of bits in the bitfield specified is by the first 2 bytes.  this is converted to a byte count (divide by 8) then the
+        // byte count number of bytes are read into the bitfield.
+        public BitField2 ReadBitField2()
+        {
+            BitField2 b = new BitField2();
+            int bitCount = ReadUInt16();
+
+            // Convert the number of bits to read to bytes.  Formula note: Must add 1 to byte count (# bits / 8) unless # of bits is factor of 8, then don't add 1 (on a byte boundary)
+            int byteCount = (bitCount / 8) + ((bitCount % 8) > 0 ? 1 : 0);
+
+            if (byteCount == 0) return null; // If zero, then return, nothing else to read.
+
+            // read the bytes into bitfield
+            b.SetBits(ReadBytes(byteCount));
+
+            return b;
+        }
+
+        #region IDisposable Support
+        private bool disposedValue = false; // To detect redundant calls
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    // TODO: dispose managed state (managed objects).
+                    fs.Close();
+                    fs.Dispose();
+                }
+
+                // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
+                // TODO: set large fields to null.
+
+                disposedValue = true;
+            }
+        }
+
+        // TODO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.
+        // ~STDFReader()
+        // {
+        //   // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+        //   Dispose(false);
+        // }
+
+        // This code added to correctly implement the disposable pattern.
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+            Dispose(true);
+            // TODO: uncomment the following line if the finalizer is overridden above.
+            // GC.SuppressFinalize(this);
+        }
+        #endregion
     }
 
 
