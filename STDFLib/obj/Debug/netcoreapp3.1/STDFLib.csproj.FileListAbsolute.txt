@@ -1,0 +1,8 @@
+C:\Users\brste\source\repos\STDFDemo\STDFLib\bin\Debug\netcoreapp3.1\STDFLib.deps.json
+C:\Users\brste\source\repos\STDFDemo\STDFLib\bin\Debug\netcoreapp3.1\STDFLib.dll
+C:\Users\brste\source\repos\STDFDemo\STDFLib\bin\Debug\netcoreapp3.1\STDFLib.pdb
+C:\Users\brste\source\repos\STDFDemo\STDFLib\obj\Debug\netcoreapp3.1\STDFLib.AssemblyInfoInputs.cache
+C:\Users\brste\source\repos\STDFDemo\STDFLib\obj\Debug\netcoreapp3.1\STDFLib.AssemblyInfo.cs
+C:\Users\brste\source\repos\STDFDemo\STDFLib\obj\Debug\netcoreapp3.1\STDFLib.dll
+C:\Users\brste\source\repos\STDFDemo\STDFLib\obj\Debug\netcoreapp3.1\STDFLib.pdb
+C:\Users\brste\source\repos\STDFDemo\STDFLib\obj\Debug\netcoreapp3.1\STDFLib.csprojAssemblyReference.cache

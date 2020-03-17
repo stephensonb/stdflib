@@ -1,0 +1,14 @@
+C:\Users\brste\source\repos\STDFDemo\STDFConsole\bin\Debug\netcoreapp3.1\STDFConsole.exe
+C:\Users\brste\source\repos\STDFDemo\STDFConsole\bin\Debug\netcoreapp3.1\STDFConsole.deps.json
+C:\Users\brste\source\repos\STDFDemo\STDFConsole\bin\Debug\netcoreapp3.1\STDFConsole.runtimeconfig.json
+C:\Users\brste\source\repos\STDFDemo\STDFConsole\bin\Debug\netcoreapp3.1\STDFConsole.runtimeconfig.dev.json
+C:\Users\brste\source\repos\STDFDemo\STDFConsole\bin\Debug\netcoreapp3.1\STDFConsole.dll
+C:\Users\brste\source\repos\STDFDemo\STDFConsole\bin\Debug\netcoreapp3.1\STDFConsole.pdb
+C:\Users\brste\source\repos\STDFDemo\STDFConsole\bin\Debug\netcoreapp3.1\STDFLib.dll
+C:\Users\brste\source\repos\STDFDemo\STDFConsole\bin\Debug\netcoreapp3.1\STDFLib.pdb
+C:\Users\brste\source\repos\STDFDemo\STDFConsole\obj\Debug\netcoreapp3.1\STDFConsole.csprojAssemblyReference.cache
+C:\Users\brste\source\repos\STDFDemo\STDFConsole\obj\Debug\netcoreapp3.1\STDFConsole.AssemblyInfoInputs.cache
+C:\Users\brste\source\repos\STDFDemo\STDFConsole\obj\Debug\netcoreapp3.1\STDFConsole.AssemblyInfo.cs
+C:\Users\brste\source\repos\STDFDemo\STDFConsole\obj\Debug\netcoreapp3.1\STDFConsole.csproj.CopyComplete
+C:\Users\brste\source\repos\STDFDemo\STDFConsole\obj\Debug\netcoreapp3.1\STDFConsole.dll
+C:\Users\brste\source\repos\STDFDemo\STDFConsole\obj\Debug\netcoreapp3.1\STDFConsole.pdb
