@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
+using System.Reflection;
 
 namespace STDFLib
 { 
@@ -14,9 +15,6 @@ namespace STDFLib
     public abstract class STDFFile : ISTDFFile
     {
         protected List<ISTDFRecord> Records { get; private set; } = new List<ISTDFRecord>();
-        protected ISTDFRecordSerializer RecordSerializer { get; set; }
-        protected STDFReader reader;
-        protected ISTDFFile versionedFile;
 
         // Required order of the records in an STDFFile
         public FAR FileAttributes { get; set; } = null;
@@ -37,40 +35,28 @@ namespace STDFLib
         public List<DTR> DatalogText { get; set; } = new List<DTR>();
         public MRR MasterResults { get; set; } = null;
 
-
-        public STDFFile()
-        {
-            FileAttributes = new FAR();
-            if (FileAttributes.Version == STDFVersions.STDFVer4)
-            {
-                versionedFile = new STDFFileV4();
-            }
-        }
-
         /// <summary>
         /// Opens, parses and reads into memory an entire STDF file
         /// </summary>
         /// <param name="pathName"></param>
-        public virtual void ReadFile(string pathName)
+        /// <summary>
+        /// Opens, parses and reads into memory an entire STDF file
+        /// </summary>
+        /// <param name="pathName"></param>
+        public ISTDFFile ReadFile(ISTDFReader reader)
         {
-            // open the file to get the file version to use
-            using STDFReader reader = new STDFReader(pathName);
-            reader.Close();
-           
             Records.Clear();
 
-            // Set the handler for the version of the file that was opened
-            if (FileAttributes.Version == STDFVersions.STDFVer4)
-            {
-                versionedFile = new STDFFileV4();
-            }
+            // set reader position to start of file
+            reader.Rewind();
 
             while (!reader.EOF)
             {
-                ISTDFRecord nextRecord = RecordSerializer.Deserialize(reader);
+                // read the header for the next record;
+                reader.ReadHeader();
+                ISTDFRecord nextRecord = DeserializeRecord(reader);
                 if (nextRecord == null) break;
                 Records.Add(nextRecord);
-                reader.SeekNextRecord();
             }
 
             Console.SetOut(new StreamWriter("testOut.txt", false));
@@ -80,7 +66,22 @@ namespace STDFLib
             {
                 Console.WriteLine(record.ToString());
             }
+
+            return this;
         }
+
+        public abstract ISTDFRecord CreateRecord(RecordType recordType);
+        public abstract ISTDFRecord DeserializeRecord(ISTDFReader reader);
+
+        public PropertyInfo[] GetSerializeableProperties(ISTDFRecord record)
+        {
+            // Get the list of properties defined by the record type, then filter by
+            // those that are decorated with the STDF attribute.  
+            // Properties will be returned sorted based on the Order property of the STDFAttribute
+            return record.GetType().GetProperties().Where(x => x.GetCustomAttributes<STDFAttribute>().Count() > 0).OrderBy(x => x.GetCustomAttribute<STDFAttribute>().Order).ToArray();
+        }
+
+        /*
 
         public T[] GetResults<T>(WIR forWafer) where T : ISTDFRecord
         {
@@ -169,6 +170,6 @@ namespace STDFLib
                 return false;
             }
         }
-
+        */
     }
 }

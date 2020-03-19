@@ -5,7 +5,7 @@
     /// </summary>
     public class PTR : STDFRecord
     {
-        protected override RecordType TypeCode => 0x1510;
+        public override RecordType TypeCode => 0x0F0A;
 
         [STDF(Order = 1)]
         public uint TEST_NUM { get; set; } = 0xFFFFFFFF;

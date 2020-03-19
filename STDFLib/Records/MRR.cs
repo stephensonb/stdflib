@@ -8,7 +8,7 @@ namespace STDFLib
     public class MRR : STDFRecord
     {
         private char _disp_cod = ' ';
-        protected override RecordType TypeCode => 0x0120;
+        public override RecordType TypeCode => 0x0114;
 
         [STDF(Order = 1)]
         public DateTime FINISH_T { get; set; } = DateTime.Now;

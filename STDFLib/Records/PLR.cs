@@ -8,6 +8,7 @@ namespace STDFLib
     /// </summary>
     public class PLR : STDFRecord
     {
+        private ushort _grp_cnt = 0;
         private List<ushort> _grp_indx = new List<ushort>();
         private List<ushort> _grp_mode = new List<ushort>();
         private List<byte>   _grp_radx = new List<byte>();
@@ -16,7 +17,7 @@ namespace STDFLib
         private List<string> _pgm_chal = new List<string>();
         private List<string> _rtn_chal = new List<string>();
 
-        protected override RecordType TypeCode => 0x0163;
+        public override RecordType TypeCode => 0x013F;
 
         [STDF(Order = 1)]
         public ushort GRP_CNT
@@ -25,11 +26,19 @@ namespace STDFLib
 
             set
             {
-                // Do nothing on set.  Only here for serialization.
+                _grp_cnt = value;
+                GRP_INDX = new ushort[value];
+                GRP_MODE = new ushort[value];
+                GRP_RADX = new byte[value];
+                PGM_CHAR = new string[value];
+                RTN_CHAR = new string[value];
+                PGM_CHAL = new string[value];
+                RTN_CHAL = new string[value];
+
             }
         }
 
-        [STDF(Order = 2)]
+        [STDF(Order = 2, ItemCountProvider = "GRP_CNT")]
         public ushort[] GRP_INDX
         {
             get => _grp_indx.ToArray();
@@ -40,7 +49,7 @@ namespace STDFLib
             }
         }
 
-        [STDF(Order = 3)]
+        [STDF(Order = 3, ItemCountProvider = "GRP_CNT")]
         public ushort[] GRP_MODE
         {
             get => _grp_indx.ToArray();
@@ -51,7 +60,7 @@ namespace STDFLib
             }
         }
 
-        [STDF(Order = 4)]
+        [STDF(Order = 4, ItemCountProvider = "GRP_CNT")]
         public byte[] GRP_RADX
         {
             get => _grp_radx.ToArray();
@@ -62,7 +71,7 @@ namespace STDFLib
             }
         }
 
-        [STDF(Order = 5)]
+        [STDF(Order = 5, ItemCountProvider = "GRP_CNT")]
         public string[] PGM_CHAR
         {
             get => _pgm_char.ToArray();
@@ -73,7 +82,7 @@ namespace STDFLib
             }
         }
 
-        [STDF(Order = 6)]
+        [STDF(Order = 6, ItemCountProvider = "GRP_CNT")]
         public string[] RTN_CHAR
         {
             get => _rtn_char.ToArray();
@@ -84,7 +93,7 @@ namespace STDFLib
             }
         }
 
-        [STDF(Order = 7)]
+        [STDF(Order = 7, ItemCountProvider = "GRP_CNT")]
         public string[] PGM_CHAL
         {
             get => _pgm_chal.ToArray();
@@ -95,7 +104,7 @@ namespace STDFLib
             }
         }
 
-        [STDF(Order = 8)]
+        [STDF(Order = 8, ItemCountProvider = "GRP_CNT")]
         public string[] RTN_CHAL
         {
             get => _rtn_chal.ToArray();

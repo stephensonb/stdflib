@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace STDFLib
@@ -9,8 +10,10 @@ namespace STDFLib
     public class PGR : STDFRecord
     {
         private ushort _grp_indx = 32768;
+        private ushort _indx_cnt = 0;
+        private List<ushort> _pmr_indx = new List<ushort>();
 
-        protected override RecordType TypeCode => 0x0162;
+        public override RecordType TypeCode => 0x013E;
 
         [STDF(Order = 1)]
         public ushort GRP_INDX
@@ -32,16 +35,29 @@ namespace STDFLib
         [STDF(Order = 1)]
         public ushort INDX_CNT
         {
-            get => (ushort)PMR_INDX.Length;
+            get => (ushort)_pmr_indx.Count;
 
             set
             {
-                // do nothing.  No need to set the count here.  this is only here for deserialization purposes
+                _indx_cnt = value;
+                PMR_INDX = new ushort[_indx_cnt];
             }
         }
 
         [STDF(Order = 1, ItemCountProvider = "INDX_CNT")]
-        public ushort[] PMR_INDX { get; set; } = new ushort[] { };
+        public ushort[] PMR_INDX 
+        {
+            get
+            {
+                return _pmr_indx.ToArray();
+            }
+
+            set
+            {
+                _pmr_indx.Clear();
+                _pmr_indx.AddRange(value);
+            } 
+        }
 
         public override string Description => "Pin Group Record";
 

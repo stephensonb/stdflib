@@ -218,5 +218,15 @@ namespace STDFLib
             }
             return chars;
         }
+
+        public override string ToString()
+        {
+            string strOut = new string(ToCharArray());
+            if (strOut == "")
+            {
+                return "(*EMPTY)";
+            }
+            return strOut;
+        }
     }
 }

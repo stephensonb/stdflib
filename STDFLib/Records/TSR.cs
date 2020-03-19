@@ -9,7 +9,7 @@ namespace STDFLib
     {
         private char _test_typ = TestTypes.Unknown;
 
-        protected override RecordType TypeCode => 0x1030;
+        public override RecordType TypeCode => 0x0A1E;
 
         [STDF(Order = 1)]
         public byte HEAD_NUM { get; set; } = 0xFF;

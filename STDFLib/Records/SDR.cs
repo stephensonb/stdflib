@@ -5,7 +5,7 @@
     /// </summary>
     public class SDR : STDFRecord
     {
-        protected override RecordType TypeCode => 0x0180;
+        public override RecordType TypeCode => 0x0150;
 
         public byte HEAD_NUM { get; set; } = 0x01;
 

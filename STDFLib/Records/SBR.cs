@@ -9,7 +9,7 @@ namespace STDFLib
     {
         private char _sbin_pf = ' ';
 
-        protected override RecordType TypeCode => 0x0150;
+        public override RecordType TypeCode => 0x0132;
 
         [STDF(Order = 1)]
         public byte HEAD_NUM { get; set; } = 0xFF;
@@ -32,10 +32,13 @@ namespace STDFLib
             {
                 switch (char.ToUpper(value))
                 {
-                    case 'Y':
-                    case 'N':
+                    case 'P':
+                    case 'F':
                     case ' ':
                         _sbin_pf = value;
+                        break;
+                    case '\0':
+                        _sbin_pf = ' ';
                         break;
                     default:
                         throw new ArgumentException(string.Format("Unsupported Soft Bin Pass/Fail value (SBIN_PF) value.  Valid values are Y, N or a space.  Value received was '{0}'.", value));

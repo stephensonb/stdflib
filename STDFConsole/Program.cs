@@ -9,8 +9,7 @@ namespace STDFConsole
         {
             string path = "C:\\Users\\brste\\source\\repos\\STDFDemo\\a595.stdf";
 
-            STDFFileV4 newFile = new STDFFileV4();
-            newFile.ReadFile(path);
+            STDFFileV4 newFile = (STDFFileV4)ISTDFFile.ReadFile(path);
         }
     }
 }

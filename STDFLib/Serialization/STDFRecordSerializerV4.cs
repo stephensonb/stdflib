@@ -5,7 +5,7 @@ namespace STDFLib
 {
     public interface ISTDFRecordSerializer
     {
-        ISTDFRecord Deserialize(STDFReader reader);
+        ISTDFRecord Deserialize(ISTDFReader reader);
         //void SerializeRecord(STDFWriter writer, ISTDFRecord record);
     }
 
@@ -24,7 +24,7 @@ namespace STDFLib
 
         }
 
-        public ISTDFRecord Deserialize(STDFReader reader)
+        public ISTDFRecord Deserialize(ISTDFReader reader)
         {
             ISTDFRecord record = STDFFileV4.CreateRecord(reader.CurrentRecordType);
 
@@ -85,6 +85,82 @@ namespace STDFLib
             }
 
             return record;
+        }
+
+        public ISTDFRecord DeserializeGDR(ISTDFReader reader)
+        {
+            GDR gdrRecord = new GDR();
+
+            // Get the number of data fields to read in (first two bytes).  Note, we assume we have already read in the header from the stream and we are sitting on the first byte
+            // of the data field count.
+            int numFields = reader.ReadUInt16();
+
+            // Save the start position of the first data record.  this will be used to make sure all record data reads start on an even by boundary
+            long startPosition = reader.Position;
+
+            // flag indicating if we are on an odd or even byte
+            bool evenByte = true;
+
+            // Holds the string representation of the field data type     
+            string fieldDataType = "";
+
+            // Holds the value read from the stream
+            object fieldValue = null;
+
+            // Read in numFields fields
+            for (int i = 0; i < numFields; i++)
+            {
+                // Determine if we are on an even byte in the data stream
+                evenByte = ((reader.Position - startPosition) % 2) == 0;
+
+                // read the type code for the next field in the stream
+                byte fieldTypeCode = (byte)reader.ReadByte();
+
+                // if the field started on an even byte, check for a padding byte (code = 0)
+                if (evenByte && fieldTypeCode == 0)
+                {
+                    // started on an even byte and a padding byte was found, so read the next byte for the actual field type.
+                    fieldTypeCode = (byte)reader.ReadByte();
+
+                    // actual field type was on an odd byte
+                    evenByte = false;
+                }
+
+                fieldDataType = GDR.GetFieldDataType(fieldTypeCode)?.Name ?? "";
+
+                // The type code was on an even byte.  Check to make sure the field data type does not need to
+                // begin on an even byte.  If it does, then we have a problem and need to throw an exception
+                if (evenByte)
+                {
+                    switch (fieldDataType)
+                    {
+                        // These types must start on an even byte alignment.  If the field type is one of these then we have an 
+                        // error because we are sitting on an odd byte in the stream.
+                        case "Int16":
+                        case "Int32":
+                        case "UInt16":
+                        case "UInt32":
+                        case "Single":
+                        case "Double":
+                            throw new STDFFormatException(string.Format("Invalid Generic Data Record format, misaligned field found.  Expected a padding byte for data type {0}, field starting at position {1}", fieldDataType, reader.Position));
+                    }
+                }
+
+                // If the data type is unknown, throw an error.
+                if (fieldDataType == "")
+                {
+                    throw new STDFFormatException(string.Format("Invalid file format or unsupported Generic Record field data type found in data stream.  Field data type code '{0}' found at position {1}", fieldTypeCode, reader.Position));
+                }
+
+                if (fieldValue != null)
+                {
+                    // Add the field to the generic data record
+                    gdrRecord.Add(new GenericRecordDataField() { FieldType = fieldTypeCode, Value = fieldValue });
+                }
+            }
+
+            // Return the generic data record
+            return gdrRecord;
         }
 
         //public void Serialize(STDFWriter writer, ISTDFRecord record) { }

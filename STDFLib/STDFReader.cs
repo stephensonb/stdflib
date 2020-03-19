@@ -1,130 +1,12 @@
 ﻿using System;
 using System.IO;
-using System.Reflection;
 using System.Text;
 
 namespace STDFLib
 {
-    public enum SeekDirection 
+    public class STDFReader : IDisposable, ISTDFReader
     {
-        Next,
-        Previous,
-        First,
-        Last,
-        End,
-        Start
-    }
-
-    public class RecordType
-    {
-        public ushort TypeCode;
-        public byte REC_TYP { get => (byte)((TypeCode & 0xFF00) >> 8); }
-        public byte REC_SUB { get => (byte)(TypeCode & 0x00FF); }
-
-        public static implicit operator RecordType(int v)
-        {
-            return new RecordType() { TypeCode = (ushort)v };
-        }
-    }
-
-    public enum Endianness
-    {
-        LittleEndian=0,
-        BigEndian=1
-    }
-
-    public class ByteConverter
-    {
-        Endianness endianness;
-
-        public ByteConverter()
-        {
-            this.endianness = BitConverter.IsLittleEndian ? Endianness.LittleEndian : Endianness.BigEndian;
-        }
-
-        public void SetEndianness(Endianness endianness)
-        {
-            this.endianness = endianness;
-        }
-
-        public short ToInt16(byte[] buffer, int start=0)
-        {
-            return (short)ToUInt16(buffer, start);
-        }
-
-        public ushort ToUInt16(byte[] buffer, int start=0)
-        {
-            return (ushort)ToUInt(buffer, start, 2);
-        }
-
-        public int ToInt32(byte[] buffer, int start = 0)
-        {
-            return (int)ToUInt(buffer, start, 4);
-        }
-
-        public uint ToUInt32(byte[] buffer, int start = 0)
-        {
-            return (uint)ToUInt(buffer, start, 4);
-        }
-
-        public long ToInt64(byte[] buffer, int start = 0)
-        {
-            return (long)ToUInt(buffer, start, 8);
-        }
-
-        public ulong ToUInt64(byte[] buffer, int start = 0)
-        {
-            return (uint)ToUInt(buffer, start, 8);
-        }
-
-        private ulong ToUInt(byte[] buffer, int start, int length)
-        {
-            ulong result = 0;
-            for(int i=0;i<length;i++)
-            {
-                if (endianness == Endianness.BigEndian)
-                {
-                    result = (result << 8) | buffer[i];
-                } else
-                {
-                    result = (result << 8) | buffer[length - i - 1];
-                }
-            }
-            return result;
-        }
-
-        private void ReverseBytes(byte[] buffer, int length, int start= 0)
-        {
-            byte[] rbuff = new byte[length];
-            for(int i=0;i<length;i++)
-            {
-                rbuff[i] = buffer[start + length - i - 1];
-            }
-            rbuff.CopyTo(buffer, start);
-        }
-
-        public float ToFloat(byte[] buffer, int start=0)
-        {
-            if(endianness == Endianness.BigEndian)
-            {
-                ReverseBytes(buffer, 4,start);
-            }
-            return BitConverter.ToSingle(buffer, start);
-        }
-
-        public double ToDouble(byte[] buffer, int start=0)
-        {
-            if(endianness == Endianness.BigEndian)
-            {
-                ReverseBytes(buffer, 8, start);
-            }
-            return BitConverter.ToDouble(buffer, start);
-        }
-    }
-
-    public class STDFReader : IDisposable
-    {
-        private readonly FileStream fs = null;
+        private readonly BinaryReader fs = null;
         private readonly ByteConverter Converter;
         public STDFCpuTypes CPU_TYPE { get; private set; }
         public STDFVersions STDF_VER { get; private set; }
@@ -135,15 +17,16 @@ namespace STDFLib
         {
             get
             {
-                return (fs == null || Position >= fs.Length || Position < 0);
+                return (fs == null || Position >= fs.BaseStream.Length || Position < 0);
             }
         }
 
         public STDFReader(string path)
         {
             Converter = new ByteConverter();
-            fs = new FileStream(path, FileMode.Open, FileAccess.Read);
+            fs = new BinaryReader(File.OpenRead(path));
             Rewind();
+            ReadHeader();
 
             // Check that the current record being pointed to is the FAR record type
             if (CurrentRecordType.TypeCode == (ushort)RecordTypes.FAR)
@@ -154,7 +37,8 @@ namespace STDFLib
                     // Configure the byte converter to use BigEndian byte ordering for int/float/doubles.
                     Converter.SetEndianness(Endianness.BigEndian);
                 }
-            } else
+            }
+            else
             {
                 throw new FormatException("Invalid STDF format.");
             }
@@ -162,16 +46,19 @@ namespace STDFLib
             STDF_VER = (STDFVersions)fs.ReadByte();
         }
 
+        public void Close()
+        {
+            fs.Close();
+        }
+
         public void Rewind()
         {
-            fs.Seek(0, SeekOrigin.Begin);
-            ReadHeader();
+            fs.BaseStream.Seek(0, SeekOrigin.Begin);
         }
 
         public void ReadHeader()
         {
-            byte[] buffer = new byte[4];
-            fs.Read(buffer, 0, 4);
+            byte[] buffer = fs.ReadBytes(4);
             CurrentRecordLength = Converter.ToUInt16(buffer, 0);
             CurrentRecordType = (ushort)(buffer[2] << 8 | buffer[3]);
         }
@@ -179,8 +66,8 @@ namespace STDFLib
         public bool SeekNextRecordType(RecordType type)
         {
             bool found = false;
- 
-            while(!found)
+
+            while (!found)
             {
                 SeekNextRecord();
                 if (CurrentRecordType.TypeCode == type.TypeCode)
@@ -195,18 +82,19 @@ namespace STDFLib
         public long SeekNextRecord()
         {
             long currentPos = Position;
-            
-            if (currentPos >= fs.Length || currentPos < 0)
+
+            if (currentPos >= fs.BaseStream.Length || currentPos < 0)
             {
                 return -1;
             }
 
             try
             {
-                fs.Seek(CurrentRecordLength+2, SeekOrigin.Current);
-            } catch(EndOfStreamException e)
+                fs.BaseStream.Seek(CurrentRecordLength + 2, SeekOrigin.Current);
+            }
+            catch (EndOfStreamException e)
             {
-                fs.Seek(0, SeekOrigin.End);
+                fs.BaseStream.Seek(0, SeekOrigin.End);
                 return -1;
             }
 
@@ -219,7 +107,7 @@ namespace STDFLib
         {
             get
             {
-                return fs.Position;
+                return fs.BaseStream.Position;
             }
         }
 
@@ -233,15 +121,14 @@ namespace STDFLib
             throw new EndOfStreamException();
         }
 
-        public virtual object[] Read(Type dataType, int itemCount = 0, int itemDataLength = int.MinValue)
+        public virtual object Read(Type dataType, int itemCount, int itemDataLength)
         {
-            // Create an array of the specified elementType and size of itemCount
-            object[] values = (object[])Array.CreateInstance(dataType, itemCount);
+            var values = Array.CreateInstance(dataType, itemCount);
 
             // Fill the array
             for (int i = 0; i < itemCount; i++)
             {
-                values[i] = Read(dataType, itemDataLength);
+                values.SetValue(Read(dataType, itemDataLength),i);
             }
 
             return values;
@@ -249,58 +136,42 @@ namespace STDFLib
 
         public short ReadInt16()
         {
-            byte[] buffer = new byte[2];
-            fs.Read(buffer, 0, 2);
-            return Converter.ToInt16(buffer);
+            return Converter.ToInt16(fs.ReadBytes(2));
         }
 
         public ushort ReadUInt16()
         {
-            byte[] buffer = new byte[2];
-            fs.Read(buffer, 0, 2);
-            return Converter.ToUInt16(buffer);
+            return Converter.ToUInt16(fs.ReadBytes(2));
         }
 
         public int ReadInt32()
         {
-            byte[] buffer = new byte[4];
-            fs.Read(buffer, 0, 4);
-            return Converter.ToInt32(buffer);
+            return Converter.ToInt32(fs.ReadBytes(4));
         }
 
         public uint ReadUInt32()
         {
-            byte[] buffer = new byte[4];
-            fs.Read(buffer, 0, 4);
-            return Converter.ToUInt32(buffer);
+            return Converter.ToUInt32(fs.ReadBytes(4));
         }
 
         public long ReadInt64()
         {
-            byte[] buffer = new byte[8];
-            fs.Read(buffer, 0, 8);
-            return Converter.ToInt64(buffer);
+            return Converter.ToInt64(fs.ReadBytes(8));
         }
 
         public ulong ReadUInt64()
         {
-            byte[] buffer = new byte[8];
-            fs.Read(buffer, 0, 8);
-            return Converter.ToUInt64(buffer);
+            return Converter.ToUInt64(fs.ReadBytes(8));
         }
 
         public float ReadSingle()
         {
-            byte[] buffer = new byte[4];
-            fs.Read(buffer, 0, 4);
-            return Converter.ToFloat(buffer);
+            return Converter.ToFloat(fs.ReadBytes(4));
         }
 
         public double ReadDouble()
         {
-            byte[] buffer = new byte[8];
-            fs.Read(buffer, 0, 8);
-            return Converter.ToDouble(buffer);
+            return Converter.ToDouble(fs.ReadBytes(8));
         }
 
         public DateTime ReadDateTime()
@@ -309,29 +180,26 @@ namespace STDFLib
             return DateTime.UnixEpoch.AddSeconds(date);
         }
 
-        public char[] ReadString(int length) 
+        public string ReadString(int length)
         {
-            if (length == 0) return new char[] { };
-            byte[] buffer = new byte[length];
-            fs.Read(buffer, 0, length);
+            if (length == 0) return "";
+            byte[] buffer = fs.ReadBytes(length);
             char[] ca = new char[length];
-            Encoding.Convert(Encoding.ASCII, Encoding.Default, buffer).CopyTo(ca,0);
-            return ca;
+            Encoding.Convert(Encoding.ASCII, Encoding.Default, buffer).CopyTo(ca, 0);
+            return new string(ca);
+        }
+
+        public char ReadChar()
+        {
+            return (char)fs.ReadByte();
         }
 
         public byte[] ReadBytes(int length)
         {
-            if (length == 0)
-            {
-                return new byte[] { };
-            }
-
-            byte[] buffer = new byte[length];
-            fs.Read(buffer, 0, length);
-            return buffer;
+            return fs.ReadBytes(length);
         }
 
-        public virtual object Read(Type dataType, int dataLength = int.MinValue)
+        public virtual object Read(Type dataType, int dataLength)
         {
             switch (dataType.Name)
             {
@@ -344,34 +212,20 @@ namespace STDFLib
                 case "Single": return ReadSingle();
                 case "Double": return ReadDouble();
                 case "DateTime": return ReadDateTime();
-                case "Char[]":
-                case "String":
-                    if (dataLength < 0)
-                    {
-                        // Assume 1st byte has length of array to read
-                        dataLength = ReadByte();
-                    }
-                    if (dataType.Name == "String")
-                    {
-                        return ReadString(dataLength).ToString();
-                    }
-                    return ReadString(dataLength);
+                case "Char": return ReadChar();
+                case "Char[]": return ReadString(dataLength < 0 ? ReadByte() : dataLength).ToCharArray();
+                case "String": return ReadString(dataLength < 0 ? ReadByte() : dataLength);
                 case "BitField": return ReadBitField();
                 case "BitField2": return ReadBitField2();
-                case "Nibbles": return ReadNibbles(1);
-                case "Byte[]":
-                    if (dataLength < 0)
-                    {
-                        dataLength = ReadByte();
-                    }
-                    return ReadBytes(dataLength);
+                case "Nibbles": return ReadNibbles(dataLength < 0 ? 1 : dataLength);
+                case "Byte[]": return ReadBytes(dataLength < 0 ? ReadByte() : dataLength);
             }
 
             return null;
         }
 
         // Read in an array of nibbles from the stream.
-        public Nibbles ReadNibbles(int nibbleCount = 1)
+        public Nibbles ReadNibbles(int nibbleCount)
         {
             Nibbles nArray = new Nibbles();
 
@@ -388,11 +242,11 @@ namespace STDFLib
         public BitField ReadBitField()
         {
             BitField b = new BitField();
-            
+
             // number of bytes to read for the bitfield
             int byteCount = ReadByte();
 
-            if (byteCount == 0) return null; // If zero, then return, nothing else to read.
+            if (byteCount == 0) return b; // If zero, then return, nothing else to read.
 
             // read the bytes into the bitfield
             b.SetBits(ReadBytes(byteCount));
@@ -410,7 +264,7 @@ namespace STDFLib
             // Convert the number of bits to read to bytes.  Formula note: Must add 1 to byte count (# bits / 8) unless # of bits is factor of 8, then don't add 1 (on a byte boundary)
             int byteCount = (bitCount / 8) + ((bitCount % 8) > 0 ? 1 : 0);
 
-            if (byteCount == 0) return null; // If zero, then return, nothing else to read.
+            if (byteCount == 0) return b; // If zero, then return, nothing else to read.
 
             // read the bytes into bitfield
             b.SetBits(ReadBytes(byteCount));

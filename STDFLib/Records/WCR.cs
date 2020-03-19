@@ -12,7 +12,7 @@ namespace STDFLib
         private char _wf_flat = DirectionCodes.Unknown;
         private byte _wf_units = (byte)WaferUnits.Unknown;
 
-        protected override RecordType TypeCode => 0x0230;
+        public override RecordType TypeCode => 0x021E;
 
         [STDF(Order = 1)]
         public float WAFR_SIZ { get; set; } = 0;

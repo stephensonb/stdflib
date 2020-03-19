@@ -23,7 +23,7 @@ namespace STDFLib
         //      Data Type: Byte 0 
         //      Byte 1-n: Field data (first byte will start on an even byte in the stream, so no need to add padding to align)
         //
-        public static ISTDFRecord Deserialize(STDFReader reader)
+        public static ISTDFRecord Deserialize(ISTDFReader reader)
         {
             GDR gdrRecord = new GDR();
 

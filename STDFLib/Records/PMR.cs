@@ -9,7 +9,7 @@ namespace STDFLib
     {
         private ushort _pmr_indx = 0;
 
-        protected override RecordType TypeCode => 0x0160;
+        public override RecordType TypeCode => 0x013C;
 
         [STDF(Order = 1)]
         public ushort PMR_INDX

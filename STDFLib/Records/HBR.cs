@@ -9,7 +9,7 @@ namespace STDFLib
     {
         private char _hbin_pf = ' ';
 
-        protected override RecordType TypeCode => 0x0140;
+        public override RecordType TypeCode => 0x0128;
 
         [STDF(Order = 1)]
         public byte HEAD_NUM { get; set; } = 0xFF;
@@ -36,6 +36,9 @@ namespace STDFLib
                     case 'N':
                     case ' ':
                         _hbin_pf = value;
+                        break;
+                    case '\0':
+                        _hbin_pf = ' ';
                         break;
                     default:
                         throw new ArgumentException(string.Format("Unsupported Hard Bin Pass/Fail value (HBIN_PF) value passed.  Valid values are Y, N or a space.  Value received was '{0}'.", value));

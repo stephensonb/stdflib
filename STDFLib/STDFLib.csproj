@@ -5,10 +5,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Serialization\BitField2Serializer.cs" />
-    <Compile Remove="Serialization\BitFieldSerializer.cs" />
-    <Compile Remove="Serialization\NibbleSerializer.cs" />
-    <Compile Remove="Serialization\VarDataSerializer.cs" />
+    <Compile Remove="Serialization\**" />
+    <EmbeddedResource Remove="Serialization\**" />
+    <None Remove="Serialization\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Remove="STDFDataReader_archive.cs" />
     <Compile Remove="STDFDataStream.cs" />
     <Compile Remove="Types\ByteArray.cs" />

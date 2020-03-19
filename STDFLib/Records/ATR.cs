@@ -7,7 +7,7 @@ namespace STDFLib
     /// </summary>
     public class ATR : STDFRecord
     {
-        protected override RecordType TypeCode => 0x0020;
+        public override RecordType TypeCode => 0x0014;
 
         [STDF(Order = 1)]
         public DateTime MOD_TIM { get; set; } = DateTime.Now;

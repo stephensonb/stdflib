@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 
 namespace STDFLib
 {
@@ -9,39 +10,9 @@ namespace STDFLib
     /// </summary>
     public class STDFFileV4 : STDFFile
     {
-        public STDFFileV4()
-        {
-            RecordSerializer = new STDFRecordSerializerV4();
-        }
+        private ISTDFReader _reader;
 
-        /// <summary>
-        /// Opens, parses and reads into memory an entire STDF file
-        /// </summary>
-        /// <param name="pathName"></param>
-        public override void ReadFile(string pathName)
-        {
-            using STDFReader reader = new STDFReader(pathName);
-            
-            Records.Clear();
-
-            while (!reader.EOF)
-            {
-                ISTDFRecord nextRecord = RecordSerializer.Deserialize(reader);
-                if (nextRecord == null) break;
-                Records.Add(nextRecord);
-                reader.SeekNextRecord();
-            }
-
-            Console.SetOut(new StreamWriter("testOut.txt",false));
-
-            // Print out the contents of the file read in for testing.
-            foreach(var record in Records)
-            {
-                Console.WriteLine(record.ToString());
-            }
-        }
-
-        public static ISTDFRecord CreateRecord(RecordType recordType)
+        public override ISTDFRecord CreateRecord(RecordType recordType)
         {
             RecordTypes typeCode = (RecordTypes)(recordType.TypeCode);
 
@@ -75,6 +46,165 @@ namespace STDFLib
             }
 
             throw new ArgumentException(string.Format("Unsupported record type {0} sub type {1}", recordType.REC_TYP, recordType.REC_SUB));
+        }
+
+        public override ISTDFRecord DeserializeRecord(ISTDFReader reader)
+        {
+            _reader = reader;
+
+            long startPosition = reader.Position;
+
+            ISTDFRecord record = CreateRecord(reader.CurrentRecordType);
+
+            if (record == null)
+            {
+                return null;
+            }
+
+            if (record is GDR)
+            {
+                return DeserializeGDR(reader);
+            }
+            else
+            {
+                // Get the list of properties that can be deserialized for the given record
+                PropertyInfo[] props = GetSerializeableProperties(record);
+
+                // If no properties to deserialize, then just return.
+                if (props.Length == 0)
+                {
+                    return record;
+                }
+
+                // Holds the STDF attribute for each property to be deserialized
+                STDFAttribute memberAttribute;
+
+                // The number of data items to be written to the stream for array types
+                int dataLength;
+                int itemCount;
+
+                foreach (var prop in props)
+                {
+                    memberAttribute = prop.GetCustomAttribute<STDFAttribute>();
+
+                    dataLength = memberAttribute.DataLength;
+
+                    // If the property is an array, then handle special
+                    if (prop.PropertyType.IsArray)
+                    {
+                        // If a property name was specified for the ArrayCountProvider property in the data member attribute, 
+                        // then get the number of array items to be written from this property
+                        if (memberAttribute.ItemCountProvider != null)
+                        {
+                            var cnt = record.GetType().GetProperty(memberAttribute.ItemCountProvider)?.GetValue(record);
+                            itemCount = 0x0000 + (ushort)cnt;
+                        }
+                        else
+                        {
+                            // No item count provider, so assume that the first byte holds the length of the array
+                            itemCount = reader.ReadByte();
+                        }
+                       
+                        if (itemCount > 0)
+                        {
+                            prop.SetValue(record, reader.Read(prop.PropertyType.GetElementType(), itemCount, dataLength));
+                        }
+                    }
+                    else
+                    {
+                        if (memberAttribute.ItemCountProvider != null)
+                        {
+                            var cnt = record.GetType().GetProperty(memberAttribute.ItemCountProvider)?.GetValue(record);
+                            dataLength = 0x0000 + (ushort)cnt;
+                        }
+
+                        prop.SetValue(record, reader.Read(prop.PropertyType, dataLength));
+                    }
+                  
+                    if (reader.Position-startPosition >= reader.CurrentRecordLength)
+                    {
+                        // if we have reached the end of the record then exit loop
+                        break;
+                    }
+                }
+            }
+
+            return record;
+        }
+
+        public ISTDFRecord DeserializeGDR(ISTDFReader reader)
+        {
+            GDR gdrRecord = new GDR();
+
+            // Get the number of data fields to read in (first two bytes).  Note, we assume we have already read in the header from the stream and we are sitting on the first byte
+            // of the data field count.
+            int numFields = reader.ReadUInt16();
+
+            // Save the start position of the first data record.  this will be used to make sure all record data reads start on an even by boundary
+            long startPosition = reader.Position;
+
+            // flag indicating if we are on an odd or even byte
+            bool evenByte = true;
+
+            // Holds the string representation of the field data type     
+            Type fieldDataType;
+
+            // Holds the value read from the stream
+            object fieldValue = null;
+
+            // Read in numFields fields
+            for (int i = 0; i < numFields; i++)
+            {
+                // Determine if we are on an even byte in the data stream
+                evenByte = ((reader.Position - startPosition) % 2) == 0;
+
+                // read the type code for the next field in the stream
+                byte fieldTypeCode = (byte)reader.ReadByte();
+
+                // if the field started on an even byte, check for a padding byte (code = 0)
+                if (evenByte && fieldTypeCode == 0)
+                {
+                    // started on an even byte and a padding byte was found, so read the next byte for the actual field type.
+                    fieldTypeCode = (byte)reader.ReadByte();
+                } 
+
+                fieldDataType = GDR.GetFieldDataType(fieldTypeCode);
+
+                // The type code was on an even byte.  Check to make sure the field data type does not need to
+                // begin on an even byte.  If it does, then we have a problem and need to throw an exception
+                if (evenByte)
+                {
+                    switch (fieldDataType?.Name)
+                    {
+                        // These types must start on an even byte alignment.  If the field type is one of these then we have an 
+                        // error because we are sitting on an odd byte in the stream.
+                        case "Int16":
+                        case "Int32":
+                        case "UInt16":
+                        case "UInt32":
+                        case "Single":
+                        case "Double":
+                            throw new STDFFormatException(string.Format("Invalid Generic Data Record format, misaligned field found.  Expected a padding byte for data type {0}, field starting at position {1}", fieldDataType, reader.Position));
+                    }
+                }
+
+                // If the data type is unknown, throw an error.
+                if (fieldDataType == null)
+                {
+                    throw new STDFFormatException(string.Format("Invalid file format or unsupported Generic Record field data type found in data stream.  Field data type code '{0}' found at position {1}", fieldTypeCode, reader.Position));
+                }
+
+                fieldValue = reader.Read(fieldDataType,-1);
+
+                if (fieldValue != null)
+                {
+                    // Add the field to the generic data record
+                    gdrRecord.Add(fieldValue);
+                }
+            }
+
+            // Return the generic data record
+            return gdrRecord;
         }
     }
 }

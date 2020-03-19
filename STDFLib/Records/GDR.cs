@@ -13,7 +13,7 @@ namespace STDFLib
 
         private static readonly Type[] field_data_types = new Type[]
         {
-            typeof(Byte),       // Type code = 0 - single byte pad field
+            null,               // Type code = 0 - reserved for padding byte
             typeof(Byte),       // Type code = 1
             typeof(UInt16),     // Type code = 2
             typeof(UInt32),     // Type code = 3
@@ -23,13 +23,13 @@ namespace STDFLib
             typeof(Single),     // Type code = 7 
             typeof(Double),     // Type code = 8 
             null,               // Type code = 9 - NOT USED
-            typeof(Char[]),     // Type code = 10
+            typeof(String),     // Type code = 10
             typeof(Byte[]),     // Type code = 11
             typeof(BitField2),  // Type code = 12
             typeof(Nibbles)     // Type code = 13
         };
 
-        protected override RecordType TypeCode => 0x5010;
+        public override RecordType TypeCode => 0x320A;
 
         [STDF(Order = 1)]
         public ushort FLD_CNT

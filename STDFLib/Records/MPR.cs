@@ -5,7 +5,7 @@
     /// </summary>
     public class MPR : STDFRecord
     {
-        protected override RecordType TypeCode => 0x1515;
+        public override RecordType TypeCode => 0x0F0F;
 
         [STDF(Order = 1)]
         public uint TEST_NUM { get; set; } = 0xFFFFFFFF;

@@ -5,7 +5,7 @@
     /// </summary>
     public class EPS : STDFRecord
     {
-        protected override RecordType TypeCode => 0x2020;
+        public override RecordType TypeCode => 0x1414;
         public override string Description => "End Program Section";
     }
 }

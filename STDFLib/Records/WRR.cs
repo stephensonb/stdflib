@@ -7,7 +7,7 @@ namespace STDFLib
     /// </summary>
     public class WRR : STDFRecord
     {
-        protected override RecordType TypeCode => 0x0220;
+        public override RecordType TypeCode => 0x0214;
 
         [STDF(Order = 1)]
         public byte HEAD_NUM { get; set; } = 0x01;

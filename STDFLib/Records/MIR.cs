@@ -7,12 +7,12 @@ namespace STDFLib
     /// </summary>
     public class MIR : STDFRecord
     {
-        private char _prot_cod = ' ';
-        private char _rtst_cod = ' ';
-        private char _cmod_cod = ' ';
-        private char _mode_cod = ' ';
+        private string _prot_cod = " ";
+        private string _rtst_cod = " ";
+        private string _cmod_cod = " ";
+        private string _mode_cod = " ";
 
-        protected override RecordType TypeCode => 0x0110;
+        public override RecordType TypeCode => 0x010A;
 
         [STDF(Order = 1)]
         public DateTime SETUP_T { get; set; } = DateTime.Now;
@@ -23,14 +23,14 @@ namespace STDFLib
         [STDF(Order = 3)]
         public byte STAT_NUM { get; set; } = 1;
 
-        [STDF(Order = 4)]
-        public char MODE_COD
+        [STDF(Order = 4, DataLength = 1)]
+        public string MODE_COD
         {
             get => _mode_cod;
 
             set
             {
-                if (!char.IsLetterOrDigit(value) && value != ' ')
+                if (!char.IsLetterOrDigit(value[0]) && value != " ")
                 {
                     throw new ArgumentException(string.Format("Unsupported Test Mode Code (MODE_COD) value.  Valid values are 0-9, A-Z or a space.  Value received was '{0}'.", value));
                 }
@@ -38,14 +38,14 @@ namespace STDFLib
             }
         }
 
-        [STDF(Order = 5)]
-        public char RTST_COD 
+        [STDF(Order = 5, DataLength = 1)]
+        public string RTST_COD 
         {
             get => _rtst_cod;
 
             set
             {
-                if (!char.IsLetterOrDigit(value) && value != ' ')
+                if (!char.IsLetterOrDigit(value[0]) && value != " ")
                 {
                     throw new ArgumentException(string.Format("Unsupported Retest Code (RTST_COD) value.  Valid values are 0-9, A-Z or a space.  Value received was '{0}'.", value));
                 }
@@ -53,14 +53,14 @@ namespace STDFLib
             }
         }
 
-        [STDF(Order = 6)]
-        public char PROT_COD
+        [STDF(Order = 6, DataLength = 1)]
+        public string PROT_COD
         {
             get => _prot_cod;
 
             set
             {
-                if (!char.IsLetterOrDigit(value) && value != ' ')
+                if (!char.IsLetterOrDigit(value[0]) && value != " ")
                 {
                     throw new ArgumentException(string.Format("Unsupported Protection Code (PROT_COD) value.  Valid values are 0-9, A-Z or a space.  Value received was '{0}'.", value));
                 }
@@ -71,14 +71,14 @@ namespace STDFLib
         [STDF(Order = 7)]
         public ushort BURN_TIM { get; set; } = 65535;
 
-        [STDF(Order = 8)]
-        public char CMOD_COD
+        [STDF(Order = 8, DataLength = 1)]
+        public string CMOD_COD
         {
             get => _cmod_cod;
 
             set
             {
-                if (!char.IsLetterOrDigit(value) && value != ' ')
+                if (!char.IsLetterOrDigit(value[0]) && value != " ")
                 {
                     throw new ArgumentException(string.Format("Unsupported Command Mode Code (CMOD_COD) value.  Valid values are 0-9, A-Z or a space.  Value received was '{0}'.", value));
                 }

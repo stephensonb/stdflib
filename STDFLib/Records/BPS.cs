@@ -5,7 +5,7 @@
     /// </summary>
     public class BPS : STDFRecord
     {
-        protected override RecordType TypeCode => 0x2010;
+        public override RecordType TypeCode => 0x140A;
 
         [STDF(Order = 1)]
         public string SEQ_NAME { get; set; } = "";

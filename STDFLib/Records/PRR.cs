@@ -9,7 +9,7 @@ namespace STDFLib
     {
         private byte _prt_flg = 0;
 
-        protected override RecordType TypeCode => 0x0520;
+        public override RecordType TypeCode => 0x0514;
 
         [STDF(Order = 1)]
         public byte HEAD_NUM { get; set; } = 0x01;

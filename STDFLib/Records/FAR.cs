@@ -5,7 +5,7 @@
     /// </summary>
     public class FAR : STDFRecord
     {
-        protected override RecordType TypeCode => 0x0010;
+        public override RecordType TypeCode => 0x000A;
 
         [STDF(Order = 1)]
         public byte CPU_TYPE { get; set; } = (byte)STDFCpuTypes.i386;  // Default Intel CPU

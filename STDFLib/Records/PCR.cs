@@ -5,7 +5,7 @@
     /// </summary>
     public class PCR : STDFRecord
     {
-        protected override RecordType TypeCode => 0x0130;
+        public override RecordType TypeCode => 0x011E;
 
         [STDF(Order = 1)]
         public byte HEAD_NUM { get; set; } = 0xFF;

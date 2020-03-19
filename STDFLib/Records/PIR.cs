@@ -5,7 +5,7 @@
     /// </summary>
     public class PIR : STDFRecord
     {
-        protected override RecordType TypeCode => 0x0510;
+        public override RecordType TypeCode => 0x050A;
 
         [STDF(Order = 1)]
         public byte HEAD_NUM { get; set; } = 0x01;

@@ -1,23 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "D:\\code\\source\\repos\\stdflib\\STDFLib\\STDFLib.csproj": {}
+    "C:\\Users\\brste\\source\\repos\\STDFDemo\\STDFLib\\STDFLib.csproj": {}
   },
   "projects": {
-    "D:\\code\\source\\repos\\stdflib\\STDFLib\\STDFLib.csproj": {
+    "C:\\Users\\brste\\source\\repos\\STDFDemo\\STDFLib\\STDFLib.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\code\\source\\repos\\stdflib\\STDFLib\\STDFLib.csproj",
+        "projectUniqueName": "C:\\Users\\brste\\source\\repos\\STDFDemo\\STDFLib\\STDFLib.csproj",
         "projectName": "STDFLib",
-        "projectPath": "D:\\code\\source\\repos\\stdflib\\STDFLib\\STDFLib.csproj",
-        "packagesPath": "C:\\Users\\Brian\\.nuget\\packages\\",
-        "outputPath": "D:\\code\\source\\repos\\stdflib\\STDFLib\\obj\\",
+        "projectPath": "C:\\Users\\brste\\source\\repos\\STDFDemo\\STDFLib\\STDFLib.csproj",
+        "packagesPath": "C:\\Users\\brste\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\brste\\source\\repos\\STDFDemo\\STDFLib\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
-        ],
         "configFilePaths": [
-          "C:\\Users\\Brian\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\brste\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -25,7 +22,7 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "https://www.nuget.org/api/v2/": {}
+          "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "netcoreapp3.1": {
@@ -55,7 +52,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.200\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.101\\RuntimeIdentifierGraph.json"
         }
       }
     }

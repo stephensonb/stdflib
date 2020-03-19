@@ -5,7 +5,7 @@
     /// </summary>
     public class RDR : STDFRecord
     {
-        protected override RecordType TypeCode => 0x0170;
+        public override RecordType TypeCode => 0x0146;
 
         [STDF(Order = 1)]
         public ushort NUM_BINS
