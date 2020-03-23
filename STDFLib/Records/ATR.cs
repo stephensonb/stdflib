@@ -7,14 +7,10 @@ namespace STDFLib
     /// </summary>
     public class ATR : STDFRecord
     {
-        public override RecordType TypeCode => 0x0014;
+        public ATR() : base(RecordTypes.ATR, "Audit Trail Record") { }
 
-        [STDF(Order = 1)]
-        public DateTime MOD_TIM { get; set; } = DateTime.Now;
+        [STDF] public DateTime MOD_TIM { get; set; } = DateTime.Now;
 
-        [STDF(Order = 2)]
-        public string CMD_LINE { get; set; } = "";
-
-        public override string Description => "Audit Trail Record";
+        [STDF] public string CMD_LINE { get; set; } = "";
     }
 }

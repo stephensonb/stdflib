@@ -5,23 +5,18 @@
     /// </summary>
     public class RDR : STDFRecord
     {
-        public override RecordType TypeCode => 0x0146;
+        public RDR() : base(RecordTypes.RDR, "Retest Data Record") { }
 
-        [STDF(Order = 1)]
-        public ushort NUM_BINS
+        [STDF] public ushort NUM_BINS
         {
             get => (ushort)RTST_BIN.Length;
 
             set
             {
-                // do nothing.  only here for serialization
+                RTST_BIN = new ushort[value];
             }
         }
 
-        [STDF(Order = 2)]
-        public ushort[] RTST_BIN { get; set; } = new ushort[] { };
-
-        public override string Description => "Retest Data Record";
-
+        [STDF("NUM_BINS")] public ushort[] RTST_BIN { get; set; } = new ushort[] { };
     }
 }

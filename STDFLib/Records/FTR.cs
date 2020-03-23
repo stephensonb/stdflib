@@ -7,81 +7,73 @@ namespace STDFLib
     /// </summary>
     public class FTR : STDFRecord
     {
-        private ushort _rtn_icnt = 0;
-        private ushort _pgm_icnt = 0;
         private List<ushort> _rtn_indx = new List<ushort>();
         private Nibbles _rtn_stat = new Nibbles();
         private List<ushort> _pgm_indx = new List<ushort>();
         private Nibbles _pgm_stat = new Nibbles();
 
-        public override RecordType TypeCode => 0x0F14;
+        public FTR() : base(0x0F14, "Functional Test Record") { }
 
-        [STDF(Order = 1)]
-        public uint TEST_NUM { get; set; } = 0xFFFFFFFF;
+        public override int GetItemCount(string propertyName)
+        {
+            return propertyName switch
+            {
+                "RTN_ICNT" => RTN_ICNT,
+                "PGM_ICNT" => PGM_ICNT,
+                _ => base.GetItemCount(propertyName),
+            };
+        }
 
-        [STDF(Order = 2)]
-        public byte HEAD_NUM { get; set; } = 0x01;
+        [STDF] public uint TEST_NUM { get; set; } = 0xFFFFFFFF;
 
-        [STDF(Order = 3)]
-        public byte SITE_NUM { get; set; } = 0x01;
+        [STDF] public byte HEAD_NUM { get; set; } = 0x01;
 
-        [STDF(Order = 4)]
-        public byte TEST_FLG { get; set; } = (byte)TestResultFlags.InvalidResult;
+        [STDF] public byte SITE_NUM { get; set; } = 0x01;
 
-        [STDF(Order = 5)]
-        public byte OPT_FLG { get; set; } = (byte)FTROptionalData.AllOptionalDataIsInvalid;
+        [STDF] public byte TEST_FLG { get; set; } = (byte)TestResultFlags.InvalidResult;
 
-        [STDF(Order = 6)]
-        public uint CYCL_CNT { get; set; } = 0;
+        [STDF] public byte OPT_FLG { get; set; } = (byte)FTROptionalData.AllOptionalDataIsInvalid;
 
-        [STDF(Order = 7)]
-        public uint REL_VADR { get; set; } = 0;
+        [STDF] public uint CYCL_CNT { get; set; } = 0;
 
-        [STDF(Order = 8)]
-        public uint REPT_CNT { get; set; } = 0;
+        [STDF] public uint REL_VADR { get; set; } = 0;
 
-        [STDF(Order = 9)]
-        public uint NUM_FAIL { get; set; } = 0;
+        [STDF] public uint REPT_CNT { get; set; } = 0;
 
-        [STDF(Order = 10)]
-        public int XFAIL_AD { get; set; } = 0;
+        [STDF] public uint NUM_FAIL { get; set; } = 0;
 
-        [STDF(Order = 11)]
-        public int YFAIL_AD { get; set; } = 0;
+        [STDF] public int XFAIL_AD { get; set; } = 0;
 
-        [STDF(Order = 12)]
-        public short VECT_OFF { get; set; } = 0;
+        [STDF] public int YFAIL_AD { get; set; } = 0;
 
-        [STDF(Order = 13)]
-        public ushort RTN_ICNT
+        [STDF] public short VECT_OFF { get; set; } = 0;
+
+        [STDF] public ushort RTN_ICNT
         {
             get => (ushort)RTN_INDX.Length;
 
             set
             {
-                _rtn_icnt = value;
                 RTN_INDX = new ushort[value];
                 RTN_STAT.Clear();
                 RTN_STAT.AddRange(new byte[value]);
             }
         }
 
-        [STDF(Order = 14)]
-        public ushort PGM_ICNT
+        [STDF] public ushort PGM_ICNT
         {
             get => (ushort)PGM_INDX.Length;
 
             set
             {
-                _pgm_icnt = value;
                 PGM_INDX = new ushort[value];
                 PGM_STAT.Clear();
                 PGM_STAT.AddRange(new byte[value]);
             }
         }
 
-        [STDF(Order = 15, ItemCountProvider = "RTN_ICNT")]
-        public ushort[] RTN_INDX 
+
+        [STDF("RTN_ICNT")] public ushort[] RTN_INDX
         {
             get
             {
@@ -95,8 +87,7 @@ namespace STDFLib
             }
         }
 
-        [STDF(Order = 16, ItemCountProvider = "RTN_ICNT")]
-        public Nibbles RTN_STAT 
+        [STDF("RTN_ICNT")] public Nibbles RTN_STAT 
         { 
             get
             {
@@ -110,8 +101,7 @@ namespace STDFLib
             } 
         }
 
-        [STDF(Order = 17, ItemCountProvider = "PGM_ICNT")]
-        public ushort[] PGM_INDX
+        [STDF("PGM_ICNT")] public ushort[] PGM_INDX
         {
             get
             {
@@ -125,8 +115,7 @@ namespace STDFLib
             }
         }
 
-        [STDF(Order = 18, ItemCountProvider = "PGM_ICNT")]
-        public Nibbles PGM_STAT 
+        [STDF("PGM_ICNT")] public Nibbles PGM_STAT 
         {
             get
             {
@@ -140,36 +129,25 @@ namespace STDFLib
             }
         }
 
-        [STDF(Order = 19)]
-        public BitField2 FAIL_PIN { get; set; } = new BitField2();
+        [STDF] public BitField2 FAIL_PIN { get; set; } = new BitField2();
 
-        [STDF(Order = 20)]
-        public string VECT_NAM { get; set; } = "";
+        [STDF] public string VECT_NAM { get; set; } = "";
 
-        [STDF(Order = 21)]
-        public string TIME_SET { get; set; } = "";
+        [STDF] public string TIME_SET { get; set; } = "";
 
-        [STDF(Order = 22)]
-        public string OP_CODE { get; set; } = "";
+        [STDF] public string OP_CODE { get; set; } = "";
 
-        [STDF(Order = 23)]
-        public string TEST_TXT { get; set; } = "";
+        [STDF] public string TEST_TXT { get; set; } = "";
 
-        [STDF(Order = 24)]
-        public string ALARM_ID { get; set; } = "";
+        [STDF] public string ALARM_ID { get; set; } = "";
 
-        [STDF(Order = 25)]
-        public string PROG_TXT { get; set; } = "";
+        [STDF] public string PROG_TXT { get; set; } = "";
 
-        [STDF(Order = 26)]
-        public string RSLT_TXT { get; set; } = "";
+        [STDF] public string RSLT_TXT { get; set; } = "";
 
-        [STDF(Order = 27)]
-        public byte PATG_NUM { get; set; } = 0;
+        [STDF] public byte PATG_NUM { get; set; } = 0;
 
-        [STDF(Order = 28)]
-        public BitField2 SPIN_MAP { get; set; } = new BitField2();
+        [STDF] public BitField2 SPIN_MAP { get; set; } = new BitField2();
 
-        public override string Description => "Functional Test Record";
     }
 }

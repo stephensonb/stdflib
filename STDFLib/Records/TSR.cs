@@ -9,16 +9,13 @@ namespace STDFLib
     {
         private char _test_typ = TestTypes.Unknown;
 
-        public override RecordType TypeCode => 0x0A1E;
+        public TSR() : base(RecordTypes.TSR, "Test Synopsis Record") { }
 
-        [STDF(Order = 1)]
-        public byte HEAD_NUM { get; set; } = 0xFF;
+        [STDF] public byte HEAD_NUM { get; set; } = 0xFF;
 
-        [STDF(Order = 2)]
-        public byte SITE_NUM { get; set; } = 0x01;
+        [STDF] public byte SITE_NUM { get; set; } = 0x01;
 
-        [STDF(Order = 3)]
-        public char TEST_TYP
+        [STDF] public char TEST_TYP
         {
             get => _test_typ;
 
@@ -38,46 +35,30 @@ namespace STDFLib
             }
         }
 
-        [STDF(Order = 4)]
-        public uint TEST_NUM { get; set; } = 0;
+        [STDF] public uint TEST_NUM { get; set; } = 0;
 
-        [STDF(Order = 5)]
-        public uint EXEC_CNT { get; set; } = 0xFFFFFFFF;
+        [STDF] public uint EXEC_CNT { get; set; } = 0xFFFFFFFF;
 
-        [STDF(Order = 6)]
-        public uint FAIL_CNT { get; set; } = 0xFFFFFFFF;
+        [STDF] public uint FAIL_CNT { get; set; } = 0xFFFFFFFF;
 
-        [STDF(Order = 7)]
-        public uint ALRM_CNT { get; set; } = 0xFFFFFFFF;
+        [STDF] public uint ALRM_CNT { get; set; } = 0xFFFFFFFF;
 
-        [STDF(Order = 8)]
-        public string TEST_NAM { get; set; } = "";
+        [STDF] public string TEST_NAM { get; set; } = "";
 
-        [STDF(Order = 9)]
-        public string SEQ_NAM { get; set; } = "";
+        [STDF] public string SEQ_NAM { get; set; } = "";
 
-        [STDF(Order = 10)]
-        public string TEST_LBL { get; set; } = "";
+        [STDF] public string TEST_LBL { get; set; } = "";
 
-        [STDF(Order = 11)]
-        public byte OPT_FLAG { get; set; } = (byte)TSROptionalData.AllOptionalDataIsInvalid;
+        [STDF] public byte OPT_FLAG { get; set; } = (byte)TSROptionalData.AllOptionalDataIsInvalid;
 
-        [STDF(Order = 12)]
-        public float TEST_TIM { get; set; } = 0;
+        [STDF] public float TEST_TIM { get; set; } = 0;
 
-        [STDF(Order = 13)]
-        public float TEST_MIN { get; set; } = 0;
+        [STDF] public float TEST_MIN { get; set; } = 0;
 
-        [STDF(Order = 14)]
-        public float TEST_MAX { get; set; } = 0;
+        [STDF] public float TEST_MAX { get; set; } = 0;
 
-        [STDF(Order = 15)]
-        public float TST_SUMS { get; set; } = 0;
+        [STDF] public float TST_SUMS { get; set; } = 0;
 
-        [STDF(Order = 16)]
-        public float TST_SQRS { get; set; } = 0;
-
-        public override string Description => "Test Synopsis Record";
-
+        [STDF] public float TST_SQRS { get; set; } = 0;
     }
 }

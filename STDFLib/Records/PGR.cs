@@ -13,10 +13,18 @@ namespace STDFLib
         private ushort _indx_cnt = 0;
         private List<ushort> _pmr_indx = new List<ushort>();
 
-        public override RecordType TypeCode => 0x013E;
+        public PGR() : base(RecordTypes.PGR, "Pin Group Record") { }
 
-        [STDF(Order = 1)]
-        public ushort GRP_INDX
+        public override int GetItemCount(string propertyName)
+        {
+            return propertyName switch
+            {
+                "INDX_CNT" => INDX_CNT,
+                _ => base.GetItemCount(propertyName)
+            };
+        }
+
+        [STDF] public ushort GRP_INDX
         {
             get => _grp_indx;
 
@@ -29,22 +37,20 @@ namespace STDFLib
             }
         }
 
-        [STDF(Order = 1)]
-        public string GRP_NAM { get; set; } = "";
+        [STDF] public string GRP_NAM { get; set; } = "";
 
-        [STDF(Order = 1)]
-        public ushort INDX_CNT
+        [STDF] public ushort INDX_CNT
         {
             get => (ushort)_pmr_indx.Count;
 
             set
             {
                 _indx_cnt = value;
-                PMR_INDX = new ushort[_indx_cnt];
+                PMR_INDX = new ushort[value];
             }
         }
 
-        [STDF(Order = 1, ItemCountProvider = "INDX_CNT")]
+        [STDF("INDX_CNT")]
         public ushort[] PMR_INDX 
         {
             get
@@ -58,8 +64,5 @@ namespace STDFLib
                 _pmr_indx.AddRange(value);
             } 
         }
-
-        public override string Description => "Pin Group Record";
-
     }
 }

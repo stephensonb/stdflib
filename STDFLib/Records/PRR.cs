@@ -9,16 +9,13 @@ namespace STDFLib
     {
         private byte _prt_flg = 0;
 
-        public override RecordType TypeCode => 0x0514;
+        public PRR() : base(RecordTypes.PRR, "Part Results Record") { }
 
-        [STDF(Order = 1)]
-        public byte HEAD_NUM { get; set; } = 0x01;
+        [STDF] public byte HEAD_NUM { get; set; } = 0x01;
 
-        [STDF(Order = 2)]
-        public byte SITE_NUM { get; set; } = 0x01;
+        [STDF] public byte SITE_NUM { get; set; } = 0x01;
 
-        [STDF(Order = 3)]
-        public byte PART_FLG
+        [STDF] public byte PART_FLG
         {
             get => _prt_flg;
 
@@ -37,34 +34,22 @@ namespace STDFLib
             }
         }
 
-        [STDF(Order = 4)]
-        public ushort NUM_TEST { get; set; } = 0;
+        [STDF] public ushort NUM_TEST { get; set; } = 0;
 
-        [STDF(Order = 5)]
-        public ushort HARD_BIN { get; set; } = 0;
+        [STDF] public ushort HARD_BIN { get; set; } = 0;
 
-        [STDF(Order = 6)]
-        public ushort SOFT_BIN { get; set; } = 0xFFFF;
+        [STDF] public ushort SOFT_BIN { get; set; } = 0xFFFF;
 
-        [STDF(Order = 7)]
-        public short X_COORD { get; set; } = -32768;
+        [STDF] public short X_COORD { get; set; } = -32768;
 
-        [STDF(Order = 8)]
-        public short Y_COORD { get; set; } = -32768;
+        [STDF] public short Y_COORD { get; set; } = -32768;
 
-        [STDF(Order = 9)]
-        public uint TEST_T { get; set; } = 0;
+        [STDF] public uint TEST_T { get; set; } = 0;
 
-        [STDF(Order = 10)]
-        public string PART_ID { get; set; } = "";
+        [STDF] public string PART_ID { get; set; } = "";
 
-        [STDF(Order = 11)]
-        public string PART_TXT { get; set; } = "";
+        [STDF] public string PART_TXT { get; set; } = "";
 
-        [STDF(Order = 12)]
-        public BitField PART_FIX { get; set; } = new BitField();
-
-        public override string Description => "Part Results Record";
-
+        [STDF] public BitField PART_FIX { get; set; } = new BitField();
     }
 }

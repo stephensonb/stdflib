@@ -4,37 +4,33 @@ using System.Text;
 
 namespace STDFLib
 {
-    public class Nibbles 
+    public class Nibbles
     {
         // The nibble array
         private readonly List<byte> nibbles;
 
-        // Maximum number of nibbles the byte array is allowed to hold
-        private readonly ushort max_nibbles;
+        public static implicit operator Nibbles(byte[] buffer)
+        {
+            return new Nibbles(buffer);
+        }
 
-        // Counter that tracks how many nibbles are currently in the byte array
-        private int nibble_count = 0;
+        public static implicit operator byte[](Nibbles fld)
+        {
+            return fld.GetNibbles();
+        }
 
         // Constructor to allow expandable nibble array, up to ushort.MaxValue * 2 nibbles.
         public Nibbles()
         {
             nibbles = new List<byte>();
-            max_nibbles = ushort.MaxValue;
         }
 
-        // Constructor to set a fixed maximum number of nibbles allowed in the nibble array
-        public Nibbles(ushort maxNibbles)
+        // Constructor to initialize nibble array with a packed array of nibbles 
+        // Low 4 bits of byte 0 is nibble 1, upper 4 bits of byte 0 is nibble 2, etc.
+        public Nibbles(byte[] buffer)
         {
-            if (maxNibbles > 0)
-            {
-                nibbles = new List<byte>(maxNibbles/2 + 1);
-                max_nibbles = maxNibbles;
-            }
-            else
-            {
-                nibbles = new List<byte>();
-                max_nibbles = ushort.MaxValue;
-            }
+            nibbles = new List<byte>(buffer);
+            Count = buffer.Length * 2;
         }
 
         // Indexer to get / set the nibble at the given nibble index.  The nibble index must be within the range of the existing number of bytes in the array (not the total nibble capacity).        
@@ -42,7 +38,7 @@ namespace STDFLib
         {
             get
             {
-                if (index > (nibble_count))
+                if (index > (Count))
                 {
                     throw new IndexOutOfRangeException("Nibble index out of range.");
                 }
@@ -52,7 +48,7 @@ namespace STDFLib
 
             set
             {
-                if (index > (nibble_count))
+                if (index > (Count))
                 {
                     throw new IndexOutOfRangeException("Nibble index out of range.");
                 }
@@ -62,18 +58,21 @@ namespace STDFLib
         }
 
         // Return the number of nibbles currently in the nibble array.
-        public int Count
+        public int Count { get; private set; } = 0;
+
+        // Return the byte count of the nibble array
+        public int ByteCount
         {
             get
             {
-                return nibble_count;
+                return Count == 0 ? 0 : Count / 2 + 1;
             }
         }
 
         public void Clear()
         {
             nibbles.Clear();
-            nibble_count = 0;
+            Count = 0;
         }
 
         // Add a nibble to the end of the array.  If the index of the new nibble is an odd number, then the nibble is added into the 4 high order bits of the current last byte in the array.
@@ -81,7 +80,7 @@ namespace STDFLib
         // NOTE: it is assumed that the nibble is contained in the lower 4 bits of the pass nibble value.  The 4 higher order are ignored.
         public void Add(byte nibble)
         {
-            if (nibble_count % 2 == 0)
+            if (Count % 2 == 0)
             {
                 // next nibble will be have an even numbered index, so we just add the passed nibble as a new byte in the nibble array, with the higher order 4 bits zeroed out
                 nibbles.Add((byte)(nibble & 0x0F));
@@ -93,7 +92,7 @@ namespace STDFLib
             }
 
             // Increase the nibble count
-            nibble_count++;
+            Count++;
         }
 
         // Adds a collection of nibbles to the nibble array.  Each byte is assumed to contain one nibble, with the nibble value contained in the 4 lower order bits.
@@ -105,29 +104,17 @@ namespace STDFLib
             }
         }
 
-        // Convert the nibble array to an array of bytes.  For odd numbered nibbles, the high 4 bits of the last byte will always be zero.  The number of bytes returned = (nibble_count / 2) + 1.
-        public byte[] GetBytes()
-        {
-            return nibbles.ToArray();
-        }
-
-        // Returns an array of bytes where each byte's lower 4 bits represent a nibble.  the number of bytes returned will be equal to nibble_count.
+        // Convert the nibble array to an array of bytes.  
+        // For odd numbered nibbles, the high 4 bits of the last byte will always be zero.  The number of bytes returned = (nibble_count / 2) + 1.
         public byte[] GetNibbles()
         {
-            byte[] byteArray = new byte[nibble_count];
-
-            for (int i = 0;i < nibble_count;i++)
-            {
-                byteArray[i] = GetNibble(i);
-            }
-
-            return byteArray;
+            return nibbles.ToArray();
         }
 
         // Get the specified nibble
         protected byte GetNibble(int index)
         {
-            if (index > nibble_count || index < 0)
+            if (index > Count || index < 0)
             {
                 throw new IndexOutOfRangeException("Value for the zero-based nibble index is out of bounds (must be >= 0 and < number of nibbles)");
             }
@@ -151,7 +138,7 @@ namespace STDFLib
         // The 4 lower order bits are then shifted if needed and 
         protected void SetNibble(byte nibble, int index)
         {
-            if ((index / 2 + 1) > nibble_count || index < 0)
+            if ((index / 2 + 1) > Count || index < 0)
             {
                 throw new IndexOutOfRangeException("Value for the zero-based nibble index is out of bounds (must be >= 0 and < number of nibbles)");
             }
@@ -199,7 +186,7 @@ namespace STDFLib
         {
             StringBuilder sb = new StringBuilder();
 
-            for (int i = 0;i < nibble_count;i++)
+            for (int i = 0;i < Count;i++)
             {
                 sb.Append(ToCharArray(i));
                 sb.Append(' ');

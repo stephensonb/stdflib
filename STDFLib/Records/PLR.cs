@@ -17,10 +17,9 @@ namespace STDFLib
         private List<string> _pgm_chal = new List<string>();
         private List<string> _rtn_chal = new List<string>();
 
-        public override RecordType TypeCode => 0x013F;
+        public PLR() : base(RecordTypes.PLR, "Pin List Record") { }
 
-        [STDF(Order = 1)]
-        public ushort GRP_CNT
+        [STDF] public ushort GRP_CNT
         {
             get => (ushort)_grp_indx.Count;
 
@@ -38,8 +37,7 @@ namespace STDFLib
             }
         }
 
-        [STDF(Order = 2, ItemCountProvider = "GRP_CNT")]
-        public ushort[] GRP_INDX
+        [STDF("GRP_CNT")] public ushort[] GRP_INDX
         {
             get => _grp_indx.ToArray();
             set
@@ -49,8 +47,7 @@ namespace STDFLib
             }
         }
 
-        [STDF(Order = 3, ItemCountProvider = "GRP_CNT")]
-        public ushort[] GRP_MODE
+        [STDF("GRP_CNT")] public ushort[] GRP_MODE
         {
             get => _grp_indx.ToArray();
             set
@@ -60,8 +57,7 @@ namespace STDFLib
             }
         }
 
-        [STDF(Order = 4, ItemCountProvider = "GRP_CNT")]
-        public byte[] GRP_RADX
+        [STDF("GRP_CNT")] public byte[] GRP_RADX
         {
             get => _grp_radx.ToArray();
             set
@@ -71,8 +67,7 @@ namespace STDFLib
             }
         }
 
-        [STDF(Order = 5, ItemCountProvider = "GRP_CNT")]
-        public string[] PGM_CHAR
+        [STDF("GRP_CNT")] public string[] PGM_CHAR
         {
             get => _pgm_char.ToArray();
             set
@@ -82,8 +77,7 @@ namespace STDFLib
             }
         }
 
-        [STDF(Order = 6, ItemCountProvider = "GRP_CNT")]
-        public string[] RTN_CHAR
+        [STDF("GRP_CNT")] public string[] RTN_CHAR
         {
             get => _rtn_char.ToArray();
             set
@@ -93,8 +87,7 @@ namespace STDFLib
             }
         }
 
-        [STDF(Order = 7, ItemCountProvider = "GRP_CNT")]
-        public string[] PGM_CHAL
+        [STDF("GRP_CNT")] public string[] PGM_CHAL
         {
             get => _pgm_chal.ToArray();
             set
@@ -104,8 +97,7 @@ namespace STDFLib
             }
         }
 
-        [STDF(Order = 8, ItemCountProvider = "GRP_CNT")]
-        public string[] RTN_CHAL
+        [STDF("GRP_CNT")] public string[] RTN_CHAL
         {
             get => _rtn_chal.ToArray();
             set
@@ -114,8 +106,6 @@ namespace STDFLib
                 _rtn_chal.AddRange(value);
             }
         }
-
-        public override string Description => "Pin List Record";
 
         public int Add(ushort index, ushort pinGroupMode=0, byte displayRadix=0, string programStateEncodingCharsRight="", string returnStateEncodingCharsRight="", string programStateEncodingCharsLeft="", string returnStateEncodingCharsLeft="")
         {

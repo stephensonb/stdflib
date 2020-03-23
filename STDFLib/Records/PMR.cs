@@ -9,10 +9,9 @@ namespace STDFLib
     {
         private ushort _pmr_indx = 0;
 
-        public override RecordType TypeCode => 0x013C;
+        public PMR() : base(RecordTypes.PMR, "Pin Map Record") { }
 
-        [STDF(Order = 1)]
-        public ushort PMR_INDX
+        [STDF] public ushort PMR_INDX
         {
             get => _pmr_indx;
 
@@ -25,24 +24,16 @@ namespace STDFLib
             }
         }
 
-        [STDF(Order = 2)]
-        public ushort CHAN_TYP { get; set; } = 0;
+        [STDF] public ushort CHAN_TYP { get; set; } = 0;
 
-        [STDF(Order = 3)]
-        public string CHAN_NAM { get; set; } = "";
+        [STDF] public string CHAN_NAM { get; set; } = "";
 
-        [STDF(Order = 4)]
-        public string PHY_NAM { get; set; } = "";
+        [STDF] public string PHY_NAM { get; set; } = "";
 
-        [STDF(Order = 5)]
-        public string LOG_NAM { get; set; } = "";
+        [STDF] public string LOG_NAM { get; set; } = "";
 
-        [STDF(Order = 6)]
-        public byte HEAD_NUM { get; set; } = 0x01;
+        [STDF] public byte HEAD_NUM { get; set; } = 0x01;
 
-        [STDF(Order = 7)]
-        public byte SITE_NUM { get; set; } = 0x01;
-
-        public override string Description => "Pin Map Record";
+        [STDF] public byte SITE_NUM { get; set; } = 0x01;
     }
 }

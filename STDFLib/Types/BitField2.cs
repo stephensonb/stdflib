@@ -10,5 +10,10 @@
         public BitField2() : base(BitFieldEncoding.PrefixedWithBitCount)
         {
         }
+
+        public BitField2(byte[] buffer) : base(BitFieldEncoding.PrefixedWithBitCount)
+        {
+            SetBits(buffer);
+        }
     }
 }

@@ -9,22 +9,17 @@ namespace STDFLib
     {
         private char _hbin_pf = ' ';
 
-        public override RecordType TypeCode => 0x0128;
+        public HBR() : base(RecordTypes.HBR, "Hard Bin Record") { }
 
-        [STDF(Order = 1)]
-        public byte HEAD_NUM { get; set; } = 0xFF;
+        [STDF] public byte HEAD_NUM { get; set; } = 0xFF;
 
-        [STDF(Order = 2)]
-        public byte SITE_NUM { get; set; } = 0x01;
+        [STDF] public byte SITE_NUM { get; set; } = 0x01;
 
-        [STDF(Order = 3)]
-        public ushort HBIN_NUM { get; set; } = 0;
+        [STDF] public ushort HBIN_NUM { get; set; } = 0;
 
-        [STDF(Order = 4)]
-        public uint HBIN_CNT { get; set; } = 0;
+        [STDF] public uint HBIN_CNT { get; set; } = 0;
 
-        [STDF(Order = 5)]
-        public char HBIN_PF
+        [STDF] public char HBIN_PF
         {
             get => _hbin_pf;
 
@@ -46,10 +41,7 @@ namespace STDFLib
             }
         }
 
-        [STDF(Order = 6)]
-        public string HBIN_NAM { get; set; }
-
-        public override string Description => "Hard Bin Record";
+        [STDF] public string HBIN_NAM { get; set; }
     }
 
 }

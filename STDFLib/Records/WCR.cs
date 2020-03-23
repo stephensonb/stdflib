@@ -12,19 +12,15 @@ namespace STDFLib
         private char _wf_flat = DirectionCodes.Unknown;
         private byte _wf_units = (byte)WaferUnits.Unknown;
 
-        public override RecordType TypeCode => 0x021E;
+        public WCR() : base(RecordTypes.WCR, "Wafer Configuration Record") { }
 
-        [STDF(Order = 1)]
-        public float WAFR_SIZ { get; set; } = 0;
+        [STDF] public float WAFR_SIZ { get; set; } = 0;
 
-        [STDF(Order = 2)]
-        public float DIE_HT { get; set; } = 0;
+        [STDF] public float DIE_HT { get; set; } = 0;
 
-        [STDF(Order = 3)]
-        public float DIE_WID { get; set; } = 0;
+        [STDF] public float DIE_WID { get; set; } = 0;
 
-        [STDF(Order = 4)]
-        public byte WF_UNITS
+        [STDF] public byte WF_UNITS
         {
             get => _wf_units;
 
@@ -45,8 +41,7 @@ namespace STDFLib
 }
         }
 
-        [STDF(Order = 5)]
-        public char WF_FLAT
+        [STDF] public char WF_FLAT
         {
             get => _wf_flat;
 
@@ -67,14 +62,11 @@ namespace STDFLib
             }
         }
 
-        [STDF(Order = 6)]
-        public short CENTER_X { get; set; } = -32768;
+        [STDF] public short CENTER_X { get; set; } = -32768;
 
-        [STDF(Order = 7)]
-        public short CENTER_Y { get; set; } = -32768;
+        [STDF] public short CENTER_Y { get; set; } = -32768;
 
-        [STDF(Order = 8)]
-        public char POS_X
+        [STDF] public char POS_X
         {
             get => _pos_x;
 
@@ -93,8 +85,7 @@ namespace STDFLib
             }
         }
 
-        [STDF(Order = 9)]
-        public char POS_Y
+        [STDF] public char POS_Y
         {
             get => _pos_y;
 
@@ -112,6 +103,5 @@ namespace STDFLib
                 }
             }
         }
-        public override string Description => "Wafer Configuration Record";
     }
 }

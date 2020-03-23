@@ -6,11 +6,11 @@ namespace STDFLib
     /// <summary>
     /// Represents a variable size bit field and methods to perform operations on individual bits within the bit field.
     /// </summary>
-    public class BitField 
+    public class BitField
     { 
-        private List<byte> bit_array;
+        protected readonly List<byte> bit_array;
 
-        private int max_bits;
+        readonly int max_bits;
 
         // store these in an array to speed things up
         private byte[] bit_mask = new byte[] 
@@ -46,6 +46,11 @@ namespace STDFLib
         public BitField() : this(BitFieldEncoding.PrefixedWithByteCount)
         {
             // Default to single byte length for the bit field, which means max of 8*255 bits = 2040.
+        }
+
+        public BitField(byte[] buffer) : this(BitFieldEncoding.PrefixedWithByteCount)
+        {
+            SetBits(buffer);
         }
 
         // Constructor to specify the possible size of the bit field.  The number of bits that can be held is an unsigned integer = 2^(lengthBytes*8)
@@ -89,6 +94,11 @@ namespace STDFLib
             {
                 return max_bits;
             }
+        }
+
+        public byte[] GetBits()
+        {
+            return bit_array.ToArray();
         }
         
         // Set the bit array to a new set of bytes
@@ -197,11 +207,7 @@ namespace STDFLib
             return (bit % 8);
         }
 
-        // Return the bit array as an array of bytes.
-        public byte[] GetBytes()
-        {
-            return bit_array.ToArray();
-        }
+
 
         /// <summary>
         /// Returns the bit field as a character array of '1' and '0'.  The bits are returned as stored in the file per the spec.
@@ -210,11 +216,18 @@ namespace STDFLib
         /// <returns></returns>
         public virtual char[] ToCharArray()
         {
-            char[] chars = new char[bit_array.Count * 8];
-
-            for(int i=0;i<bit_array.Count * 8;i++)
+            char[] chars = new char[BitCount*9];
+            
+            int strpos = 0;
+            
+            for(int i=0;i<BitCount;i++)
             {
-                chars[i] = (GetBit((ushort)i) == 1) ? '1' : '0';
+                chars[strpos] = (GetBit((ushort)i) == 1) ? '1' : '0';
+                if (i > 0 && (i % 8 == 0))
+                {
+                    chars[++strpos] = ' ';
+                }
+                strpos++;
             }
             return chars;
         }

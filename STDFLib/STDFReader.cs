@@ -92,7 +92,7 @@ namespace STDFLib
             {
                 fs.BaseStream.Seek(CurrentRecordLength + 2, SeekOrigin.Current);
             }
-            catch (EndOfStreamException e)
+            catch (EndOfStreamException)
             {
                 fs.BaseStream.Seek(0, SeekOrigin.End);
                 return -1;

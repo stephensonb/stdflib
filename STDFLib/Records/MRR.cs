@@ -8,13 +8,12 @@ namespace STDFLib
     public class MRR : STDFRecord
     {
         private char _disp_cod = ' ';
-        public override RecordType TypeCode => 0x0114;
 
-        [STDF(Order = 1)]
-        public DateTime FINISH_T { get; set; } = DateTime.Now;
+        public MRR() : base(RecordTypes.MRR, "Master Results Record") { }
 
-        [STDF(Order = 2)]
-        public char DISP_COD
+        [STDF]public DateTime FINISH_T { get; set; } = DateTime.Now;
+
+        [STDF] public char DISP_COD
         {
             get => _disp_cod;
 
@@ -28,12 +27,8 @@ namespace STDFLib
             }
         }
 
-        [STDF(Order = 3)]
-        public string USR_DESC { get; set; } = "";
+        [STDF] public string USR_DESC { get; set; } = "";
 
-        [STDF(Order = 4)]
-        public string EXC_DESC { get; set; } = "";
-
-        public override string Description => "Master Results Record";
+        [STDF] public string EXC_DESC { get; set; } = "";
     }
 }

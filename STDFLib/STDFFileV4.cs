@@ -2,209 +2,142 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Text;
+using System.Collections;
 
 namespace STDFLib
 {
     /// <summary>
     /// Encapsulates STDF file records and related functions
     /// </summary>
-    public class STDFFileV4 : STDFFile
+    public class STDFFileV4 : ISTDFFile
     {
-        private ISTDFReader _reader;
+        protected List<ISTDFRecord> Records { get; private set; } = new List<ISTDFRecord>();
 
-        public override ISTDFRecord CreateRecord(RecordType recordType)
+        // Required order of the records in an STDFFile
+        public FAR FileAttributes { get; set; } = null;
+        public List<ATR> AuditTrails { get; set; } = new List<ATR>();
+        public MIR MasterInformation { get; set; } = null;
+        public RDR RetestData { get; set; } = null;
+        public List<SDR> SiteDescriptions { get; set; } = new List<SDR>();
+        public WCR WaferConfiguration { get; set; } = null;
+        public List<PCR> PartCounts { get; set; } = new List<PCR>();
+        public List<HBR> HardBins { get; set; } = new List<HBR>();
+        public List<SBR> SoftwareBins { get; set; } = new List<SBR>();
+        public List<PMR> PinMaps { get; set; } = new List<PMR>();
+        public List<PGR> PinGroups { get; set; } = new List<PGR>();
+        public List<PLR> PinLists { get; set; } = new List<PLR>();
+        public List<WIR> WaferInformation { get; set; } = new List<WIR>();
+        public List<TSR> TestSynopsis { get; set; } = new List<TSR>();
+        public List<GDR> GenericData { get; set; } = new List<GDR>();
+        public List<DTR> DatalogText { get; set; } = new List<DTR>();
+        public MRR MasterResults { get; set; } = null;
+
+        /// <summary>
+        /// Opens, parses and reads into memory an entire STDF file
+        /// </summary>
+        /// <param name="pathName"></param>
+        /// <summary>
+        /// Opens, parses and reads into memory an entire STDF file
+        /// </summary>
+        /// <param name="pathName"></param>
+        public ISTDFFile ReadFile(string path)
         {
-            RecordTypes typeCode = (RecordTypes)(recordType.TypeCode);
+            Records.Clear();
 
-            switch (typeCode)
+            STDFBinaryReader reader = new STDFBinaryReader(path);
+            STDFSerializerV4 serializer = new STDFSerializerV4();
+
+            while(true)
             {
-                case RecordTypes.FAR: return new FAR();  // File Attributes
-                case RecordTypes.ATR: return new ATR();  // Audit Trail
-                case RecordTypes.MIR: return new MIR();  // Master Information
-                case RecordTypes.MRR: return new MRR();  // Master Results
-                case RecordTypes.PCR: return new PCR();  // Part Count
-                case RecordTypes.HBR: return new HBR();  // Hard Bin
-                case RecordTypes.SBR: return new SBR();  // Soft Bin
-                case RecordTypes.PMR: return new PMR();  // Pin Map
-                case RecordTypes.PGR: return new PGR();  // Pin Group
-                case RecordTypes.PLR: return new PLR();  // Pin List
-                case RecordTypes.RDR: return new RDR();  // Retest Data
-                case RecordTypes.SDR: return new SDR();  // Site Description
-                case RecordTypes.WIR: return new WIR();  // Wafer Information
-                case RecordTypes.WRR: return new WRR();  // Wafer Results
-                case RecordTypes.WCR: return new WCR();  // Wafer Configuration
-                case RecordTypes.PIR: return new PIR();  // Part Information
-                case RecordTypes.PRR: return new PRR();  // Part Results
-                case RecordTypes.TSR: return new TSR();  // Test Synopsis
-                case RecordTypes.PTR: return new PTR();  // Parametric Test
-                case RecordTypes.MPR: return new MPR();  // Multiple Result Parametric Test
-                case RecordTypes.FTR: return new FTR();  // Functional Test 
-                case RecordTypes.BPS: return new BPS();  // Begin Program Segment
-                case RecordTypes.EPS: return new EPS();  // End Program Segment
-                case RecordTypes.GDR: return new GDR();  // Generic Data
-                case RecordTypes.DTR: return new DTR();  // Datalog Text
+                try
+                {
+                    ISTDFRecord record = STDFSerializerV4.Deserialize(reader);
+                    if (record != null)
+                    {
+                        Records.Add(record);
+                    }
+                } catch(EndOfStreamException)
+                {
+                    break;
+                }
             }
 
-            throw new ArgumentException(string.Format("Unsupported record type {0} sub type {1}", recordType.REC_TYP, recordType.REC_SUB));
+            Console.SetOut(new StreamWriter("testOut.txt", false));
+
+            // Print out the contents of the file read in for testing.
+            foreach (var record in Records)
+            {
+                Console.WriteLine(FormatRecord(serializer, record));
+            }
+
+            Console.Out.Close();
+            Console.OpenStandardOutput();
+
+            return this;
         }
 
-        public override ISTDFRecord DeserializeRecord(ISTDFReader reader)
+        public void WriteFile(string path)
         {
-            _reader = reader;
 
-            long startPosition = reader.Position;
-
-            ISTDFRecord record = CreateRecord(reader.CurrentRecordType);
-
-            if (record == null)
-            {
-                return null;
-            }
-
-            if (record is GDR)
-            {
-                return DeserializeGDR(reader);
-            }
-            else
-            {
-                // Get the list of properties that can be deserialized for the given record
-                PropertyInfo[] props = GetSerializeableProperties(record);
-
-                // If no properties to deserialize, then just return.
-                if (props.Length == 0)
-                {
-                    return record;
-                }
-
-                // Holds the STDF attribute for each property to be deserialized
-                STDFAttribute memberAttribute;
-
-                // The number of data items to be written to the stream for array types
-                int dataLength;
-                int itemCount;
-
-                foreach (var prop in props)
-                {
-                    memberAttribute = prop.GetCustomAttribute<STDFAttribute>();
-
-                    dataLength = memberAttribute.DataLength;
-
-                    // If the property is an array, then handle special
-                    if (prop.PropertyType.IsArray)
-                    {
-                        // If a property name was specified for the ArrayCountProvider property in the data member attribute, 
-                        // then get the number of array items to be written from this property
-                        if (memberAttribute.ItemCountProvider != null)
-                        {
-                            var cnt = record.GetType().GetProperty(memberAttribute.ItemCountProvider)?.GetValue(record);
-                            itemCount = 0x0000 + (ushort)cnt;
-                        }
-                        else
-                        {
-                            // No item count provider, so assume that the first byte holds the length of the array
-                            itemCount = reader.ReadByte();
-                        }
-                       
-                        if (itemCount > 0)
-                        {
-                            prop.SetValue(record, reader.Read(prop.PropertyType.GetElementType(), itemCount, dataLength));
-                        }
-                    }
-                    else
-                    {
-                        if (memberAttribute.ItemCountProvider != null)
-                        {
-                            var cnt = record.GetType().GetProperty(memberAttribute.ItemCountProvider)?.GetValue(record);
-                            dataLength = 0x0000 + (ushort)cnt;
-                        }
-
-                        prop.SetValue(record, reader.Read(prop.PropertyType, dataLength));
-                    }
-                  
-                    if (reader.Position-startPosition >= reader.CurrentRecordLength)
-                    {
-                        // if we have reached the end of the record then exit loop
-                        break;
-                    }
-                }
-            }
-
-            return record;
         }
 
-        public ISTDFRecord DeserializeGDR(ISTDFReader reader)
+        // Pretty (maybe) formatting of the record contents for debugging
+        public string FormatRecord(STDFSerializerV4 serializer, ISTDFRecord record)
         {
-            GDR gdrRecord = new GDR();
+            var props = STDFSerializerV4.GetSerializeableProperties(record);
 
-            // Get the number of data fields to read in (first two bytes).  Note, we assume we have already read in the header from the stream and we are sitting on the first byte
-            // of the data field count.
-            int numFields = reader.ReadUInt16();
+            StringBuilder sb = new StringBuilder();
 
-            // Save the start position of the first data record.  this will be used to make sure all record data reads start on an even by boundary
-            long startPosition = reader.Position;
+            sb.Append("--------------------------------------------------------\n");
+            sb.AppendFormat("{0,25}:{1,-30}\n", "RECORD", this.GetType().Name);
+            sb.Append("========================= ==============================\n");
 
-            // flag indicating if we are on an odd or even byte
-            bool evenByte = true;
-
-            // Holds the string representation of the field data type     
-            Type fieldDataType;
-
-            // Holds the value read from the stream
-            object fieldValue = null;
-
-            // Read in numFields fields
-            for (int i = 0; i < numFields; i++)
+            foreach (var prop in props)
             {
-                // Determine if we are on an even byte in the data stream
-                evenByte = ((reader.Position - startPosition) % 2) == 0;
+                object propValue = prop.GetValue(record);
 
-                // read the type code for the next field in the stream
-                byte fieldTypeCode = (byte)reader.ReadByte();
-
-                // if the field started on an even byte, check for a padding byte (code = 0)
-                if (evenByte && fieldTypeCode == 0)
+                if (propValue == null)
                 {
-                    // started on an even byte and a padding byte was found, so read the next byte for the actual field type.
-                    fieldTypeCode = (byte)reader.ReadByte();
-                } 
+                    sb.AppendFormat("{0,25}:{1,-30}\n", prop.Name, "Null");
+                    continue;
+                }
 
-                fieldDataType = GDR.GetFieldDataType(fieldTypeCode);
-
-                // The type code was on an even byte.  Check to make sure the field data type does not need to
-                // begin on an even byte.  If it does, then we have a problem and need to throw an exception
-                if (evenByte)
+                if (prop.PropertyType.Name.EndsWith("[]") || prop.PropertyType.Name.StartsWith("List`1") && propValue != null)
                 {
-                    switch (fieldDataType?.Name)
+                    int count = 0;
+                    sb.AppendFormat("{0,25}:LIST/ARRAY OF {1} ",
+                        prop.Name,
+                        propValue.GetType().Name.EndsWith("[]") ? propValue.GetType().GetElementType().Name : propValue.GetType().GetGenericArguments()[0].Name);
+
+                    IEnumerator pv = ((IEnumerable)propValue)?.GetEnumerator();
+
+                    pv.Reset();
+
+                    while (pv.MoveNext())
                     {
-                        // These types must start on an even byte alignment.  If the field type is one of these then we have an 
-                        // error because we are sitting on an odd byte in the stream.
-                        case "Int16":
-                        case "Int32":
-                        case "UInt16":
-                        case "UInt32":
-                        case "Single":
-                        case "Double":
-                            throw new STDFFormatException(string.Format("Invalid Generic Data Record format, misaligned field found.  Expected a padding byte for data type {0}, field starting at position {1}", fieldDataType, reader.Position));
+                        if (count == 0)
+                        {
+                            sb.Append("\n");
+                        }
+                        sb.AppendFormat("{0,-55}\n", pv.Current.ToString());
+                        count++;
+                    }
+
+                    if (count == 0)
+                    {
+                        sb.Append("(*EMPTY)\n");
                     }
                 }
-
-                // If the data type is unknown, throw an error.
-                if (fieldDataType == null)
+                else
                 {
-                    throw new STDFFormatException(string.Format("Invalid file format or unsupported Generic Record field data type found in data stream.  Field data type code '{0}' found at position {1}", fieldTypeCode, reader.Position));
-                }
-
-                fieldValue = reader.Read(fieldDataType,-1);
-
-                if (fieldValue != null)
-                {
-                    // Add the field to the generic data record
-                    gdrRecord.Add(fieldValue);
+                    sb.AppendFormat("{0,25}:{1,-30}\n", prop.Name, propValue?.ToString());
                 }
             }
 
-            // Return the generic data record
-            return gdrRecord;
+            sb.AppendLine();
+
+            return sb.ToString();
         }
     }
 }

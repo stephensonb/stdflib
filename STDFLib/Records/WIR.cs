@@ -7,20 +7,14 @@ namespace STDFLib
     /// </summary>
     public class WIR : STDFRecord
     {
-        public override RecordType TypeCode => 0x020A;
+        public WIR() : base(RecordTypes.WIR, "Wafer Information Record") { }
 
-        [STDF(Order = 1)]
-        public byte HEAD_NUM { get; set; } = 0x01;
+        [STDF] public byte HEAD_NUM { get; set; } = 0x01;
 
-        [STDF(Order = 2)]
-        public byte SITE_GRP { get; set; } = 0xFF;
+        [STDF] public byte SITE_GRP { get; set; } = 0xFF;
 
-        [STDF(Order = 3)]
-        public DateTime START_T { get; set; } = DateTime.Now;
+        [STDF] public DateTime START_T { get; set; } = DateTime.Now;
 
-        [STDF(Order = 4)]
-        public string WAFER_ID { get; set; } = "";
-
-        public override string Description => "Wafer Information Record";
+        [STDF] public string WAFER_ID { get; set; } = "";
     }
 }

@@ -6,12 +6,9 @@
     /// </summary>
     public class DTR : STDFRecord
     {
-        public override RecordType TypeCode => 0x321E;
+        public DTR() : base(RecordTypes.DTR, "Datalog Text Record") { }
 
-        [STDF(Order = 1)]
-        public string TEXT_DAT { get; set; } = "";
-
-        public override string Description => "Datalog Text Record";
+        [STDF] public string TEXT_DAT { get; set; } = "";
 
     }
 }
