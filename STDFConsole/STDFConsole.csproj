@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\STDFLib\STDFLib.csproj" />
+    <ProjectReference Include="..\STDFLib2\STDFLib2.csproj" />
   </ItemGroup>
 
 </Project>
