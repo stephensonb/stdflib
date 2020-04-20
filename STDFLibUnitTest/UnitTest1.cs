@@ -115,6 +115,8 @@ namespace STDFLibUnitTest
         [TestMethod]
         public void Test_Read_Input_File_Record_Count()
         {
+
+            Console.WriteLine(System.IO.Directory.GetCurrentDirectory());
             string filePath = "../../../../test/a595.stdf";
             IEnumerable<ISTDFRecord> records = ReadFile(filePath);
             Assert.IsTrue(records.Count() == 40651);
