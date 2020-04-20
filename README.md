@@ -10,7 +10,7 @@ The current version reads and writes STDF files conforming to Version 4 of the S
 - Include the built library into your project and add a reference to it.
 - Sample code to read a file as a list of records:
 
-  _Note: The **STDFRecordFormatter** class implements the IDisposable interface. Use with 'using' to auto release managed resources when we go out of scope at the end of the enclosing block._
+  _**Note:** The **STDFRecordFormatter** class implements the IDisposable interface. Use with 'using' to auto release managed resources when we go out of scope at the end of the enclosing block._
 
 ```csharp
 public IEnumerable<ISTDFRecord> ReadFile(string path)
@@ -50,7 +50,9 @@ public IEnumerable<ISTDFRecord> ReadFile(string path)
 }
 ```
 
-- Sample code to write out a list of records (note: no error checking is done to determine if the sequence of records is valid, however, the format of each record written is written to adhere to the STDF V4 specification).
+- Sample code to write out a list of records
+
+  _**Note:** no error checking is done to determine if the sequence of records is valid, however, the format of each record written is written to adhere to the STDF V4 specification._
 
 ```csharp
 public void WriteFile(string path, IEnumerable<ISTDFRecord> records)
