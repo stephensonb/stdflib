@@ -50,13 +50,6 @@
             SerializeValue(9, obj.XFAIL_AD);
             SerializeValue(10, obj.YFAIL_AD);
             SerializeValue(11, obj.VECT_OFF);
-            CurrentInfo.GetEntry(5).IsMissingValue = ((obj.OPT_FLAG & (byte)FTROptionalData.CycleCountDataIsInvalid) > 0);
-            CurrentInfo.GetEntry(6).IsMissingValue = ((obj.OPT_FLAG & (byte)FTROptionalData.RelativeVectorAddressIsInvalid) > 0);
-            CurrentInfo.GetEntry(7).IsMissingValue = ((obj.OPT_FLAG & (byte)FTROptionalData.RepeatCountOfVectorIsInvalid) > 0);
-            CurrentInfo.GetEntry(8).IsMissingValue = ((obj.OPT_FLAG & (byte)FTROptionalData.NumberOfFailsIsInvalid) > 0);
-            CurrentInfo.GetEntry(9).IsMissingValue = ((obj.OPT_FLAG & (byte)FTROptionalData.XYFailAddressIsInvalid) > 0);
-            CurrentInfo.GetEntry(10).IsMissingValue = ((obj.OPT_FLAG & (byte)FTROptionalData.XYFailAddressIsInvalid) > 0);
-            CurrentInfo.GetEntry(11).IsMissingValue = ((obj.OPT_FLAG & (byte)FTROptionalData.VectorOffsetDataIsInvalid) > 0);
             SerializeValue(12, obj.RTN_ICNT);
             SerializeValue(13, obj.PGM_ICNT);
             if (obj.RTN_ICNT > 0) SerializeValue(14, obj.RTN_INDX);
@@ -113,17 +106,10 @@
             if (CurrentInfo.IsValueSet(23)) obj.ALARM_ID = DeserializeValue<string>(23);
             if (CurrentInfo.IsValueSet(24)) obj.PROG_TXT = DeserializeValue<string>(24);
             if (CurrentInfo.IsValueSet(25)) obj.RSLT_TXT = DeserializeValue<string>(25);
-            // Set original values for fields that could be changed due to using a default value
-            if (CurrentInfo.IsValueSet(26))
-            {
-                obj.PATG_NUM = DeserializeValue<byte?>(26);
-                obj.ORIG_PATG_NUM = info.GetValue<byte?>(26);
-            }
-            if (CurrentInfo.IsValueSet(27))
-            {
-                obj.SPIN_MAP = DeserializeValue<ByteArray>(27);
-                obj.ORIG_SPIN_MAP = info.GetValue<ByteArray>(27);
-            }
+            obj.PATG_NUM = DeserializeValue<byte?>(26);
+            obj.ORIG_PATG_NUM = info.GetValue<byte?>(26);
+            obj.SPIN_MAP = DeserializeValue<ByteArray>(27);
+            obj.ORIG_SPIN_MAP = info.GetValue<ByteArray>(27);
 
             SetOptionalFlags(obj);
 

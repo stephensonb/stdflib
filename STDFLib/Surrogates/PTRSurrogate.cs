@@ -36,11 +36,6 @@
 
             GetDefaults();
 
-            if (CurrentDefaults != null)
-            {
-                ;
-            }
-
             SetOptionalFlags(obj);
 
             SerializeValue(0, obj.TEST_NUM);
@@ -64,14 +59,6 @@
             SerializeValue(18, obj.LO_SPEC, obj.ORIG_LO_SPEC);
             SerializeValue(19, obj.HI_SPEC, obj.ORIG_HI_SPEC);
 
-            //CurrentInfo.GetEntry(9).IsMissingValue = ((obj.OPT_FLAG & (byte)PTROptionalData.RES_SCAL_Invalid) > 0);
-            //CurrentInfo.GetEntry(10).IsMissingValue = ((obj.OPT_FLAG & (byte)PTROptionalData.LO_LIMIT_LLM_SCAL_Invalid) > 0);
-            //CurrentInfo.GetEntry(11).IsMissingValue = ((obj.OPT_FLAG & (byte)PTROptionalData.HI_LIMIT_HLM_SCAL_Invalid) > 0);
-            //CurrentInfo.GetEntry(12).IsMissingValue = ((obj.OPT_FLAG & (byte)PTROptionalData.NoLoLimitThisTest) > 0);
-            //CurrentInfo.GetEntry(13).IsMissingValue = ((obj.OPT_FLAG & (byte)PTROptionalData.NoHiLimitThisTest) > 0);
-            //CurrentInfo.GetEntry(18).IsMissingValue = ((obj.OPT_FLAG & (byte)PTROptionalData.NoLoLimitSpec) > 0);
-            //CurrentInfo.GetEntry(19).IsMissingValue = ((obj.OPT_FLAG & (byte)PTROptionalData.NoHiLimitSpec) > 0);
-
             // Set missing value flag on OPT_FLAG.  We can truncate this from the record if all fields after the OPT_FLAG field
             // are missing also.  If not, it will be written anyway.
             CurrentInfo.GetEntry(8).IsMissingValue = true;
@@ -88,11 +75,6 @@
             obj.SITE_NUM = DeserializeValue<byte>(2);
 
             GetDefaults();
-
-            if (CurrentDefaults != null)
-            {
-                ;
-            }
 
             obj.TEST_FLG = DeserializeValue<byte>(3);
             obj.PARM_FLG = DeserializeValue<byte>(4);

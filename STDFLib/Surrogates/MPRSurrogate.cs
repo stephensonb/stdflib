@@ -66,20 +66,8 @@
             SerializeValue(24, obj.C_HLMFMT, obj.ORIG_C_HLMFMT);
             SerializeValue(25, obj.LO_SPEC, obj.ORIG_LO_SPEC);
             SerializeValue(26, obj.HI_SPEC, obj.ORIG_HI_SPEC);
-
-            CurrentInfo.GetEntry(12).IsMissingValue = ((obj.OPT_FLAG & (byte)MPROptionalData.RES_SCAL_Invalid) > 0);
-            CurrentInfo.GetEntry(13).IsMissingValue = ((obj.OPT_FLAG & (byte)MPROptionalData.LO_LIMIT_LLM_SCAL_Invalid) > 0);
-            CurrentInfo.GetEntry(14).IsMissingValue = ((obj.OPT_FLAG & (byte)MPROptionalData.HI_LIMIT_HLM_SCAL_Invalid) > 0);
-            CurrentInfo.GetEntry(15).IsMissingValue = ((obj.OPT_FLAG & (byte)MPROptionalData.NoLoLimitThisTest) > 0);
-            CurrentInfo.GetEntry(16).IsMissingValue = ((obj.OPT_FLAG & (byte)MPROptionalData.NoHiLimitThisTest) > 0);
-            CurrentInfo.GetEntry(25).IsMissingValue = ((obj.OPT_FLAG & (byte)MPROptionalData.NoLoLimitSpec) > 0);
-            CurrentInfo.GetEntry(26).IsMissingValue = ((obj.OPT_FLAG & (byte)MPROptionalData.NoHiLimitSpec) > 0);
-
-            if ((obj.OPT_FLAG & (byte)MPROptionalData.START_IN_INCR_IN_Invalid) == 0)
-            {
-                CurrentInfo.GetEntry(17).IsMissingValue = false;
-                CurrentInfo.GetEntry(18).IsMissingValue = false;
-            }
+            CurrentInfo.GetEntry(17).IsMissingValue = false;
+            CurrentInfo.GetEntry(18).IsMissingValue = false;
 
             AddDefaults();
         }
@@ -103,85 +91,38 @@
             obj.TEST_TXT = DeserializeValue<string>(9);
             obj.ALARM_ID = DeserializeValue<string>(10);
             obj.OPT_FLAG = DeserializeValue<byte>(11);
-            if (CurrentInfo.IsValueSet(12))
-            {
-                obj.RES_SCAL = DeserializeValue<sbyte?>(12);
-                obj.ORIG_RES_SCAL = info.GetValue<sbyte?>(12);
-            }
-            if (CurrentInfo.IsValueSet(13))
-            {
-                obj.LLM_SCAL = DeserializeValue<sbyte?>(13);
-                obj.ORIG_LLM_SCAL = info.GetValue<sbyte?>(13);
-            }
-            if (CurrentInfo.IsValueSet(14))
-            {
-                obj.HLM_SCAL = DeserializeValue<sbyte?>(14);
-                obj.ORIG_HLM_SCAL = info.GetValue<sbyte?>(14);
-            }
-            if (CurrentInfo.IsValueSet(15))
-            {
-                obj.LO_LIMIT = DeserializeValue<float?>(15);
-                obj.ORIG_LO_LIMIT = info.GetValue<float?>(15);
-            }
-            if (CurrentInfo.IsValueSet(16))
-            {
-                obj.HI_LIMIT = DeserializeValue<float?>(16);
-                obj.ORIG_HI_LIMIT = info.GetValue<float?>(16);
-            }
-            if (CurrentInfo.IsValueSet(17))
-            {
-                obj.START_IN = DeserializeValue<float?>(17);
-                obj.ORIG_START_IN = info.GetValue<float?>(17);
-            }
-            if (CurrentInfo.IsValueSet(18))
-            {
-                obj.INCR_IN = DeserializeValue<float?>(18);
-                obj.ORIG_INCR_IN = info.GetValue<float?>(18);
-            }
-            if (CurrentInfo.IsValueSet(19))
-            {
-                obj.RTN_INDX = DeserializeValue<ushort[]>(19);
-                obj.ORIG_RTN_INDX = info.GetValue<ushort[]>(19);
-            }
-            if (CurrentInfo.IsValueSet(20))
-            {
-                obj.UNITS = DeserializeValue<string>(20);
-                obj.ORIG_UNITS = info.GetValue<string>(20);
-            }
-            if (CurrentInfo.IsValueSet(21))
-            {
-                obj.UNITS_IN = DeserializeValue<string>(21);
-                obj.ORIG_UNITS_IN = info.GetValue<string>(21);
-            }
-            if (CurrentInfo.IsValueSet(22))
-            {
-                obj.C_RESFMT = DeserializeValue<string>(22);
-                obj.ORIG_C_RESFMT = info.GetValue<string>(22);
-            }
-            if (CurrentInfo.IsValueSet(23))
-            {
-                obj.C_LLMFMT = DeserializeValue<string>(23);
-                obj.ORIG_C_LLMFMT = info.GetValue<string>(23);
-            }
-            if (CurrentInfo.IsValueSet(24))
-            {
-                obj.C_HLMFMT = DeserializeValue<string>(24);
-                obj.ORIG_C_HLMFMT = info.GetValue<string>(24);
-            }
-            if (CurrentInfo.IsValueSet(25))
-            {
-                obj.LO_SPEC = DeserializeValue<float?>(25);
-                obj.ORIG_LO_SPEC = info.GetValue<float?>(25);
-            }
-            if (CurrentInfo.IsValueSet(26))
-            {
-                obj.HI_SPEC = DeserializeValue<float?>(26);
-                obj.ORIG_HI_SPEC = info.GetValue<float?>(26);
-            }
+            obj.RES_SCAL = DeserializeValue<sbyte?>(12);
+            obj.ORIG_RES_SCAL = info.GetValue<sbyte?>(12);
+            obj.LLM_SCAL = DeserializeValue<sbyte?>(13);
+            obj.ORIG_LLM_SCAL = info.GetValue<sbyte?>(13);
+            obj.HLM_SCAL = DeserializeValue<sbyte?>(14);
+            obj.ORIG_HLM_SCAL = info.GetValue<sbyte?>(14);
+            obj.LO_LIMIT = DeserializeValue<float?>(15);
+            obj.ORIG_LO_LIMIT = info.GetValue<float?>(15);
+            obj.HI_LIMIT = DeserializeValue<float?>(16);
+            obj.ORIG_HI_LIMIT = info.GetValue<float?>(16);
+            obj.START_IN = DeserializeValue<float?>(17);
+            obj.ORIG_START_IN = info.GetValue<float?>(17);
+            obj.INCR_IN = DeserializeValue<float?>(18);
+            obj.ORIG_INCR_IN = info.GetValue<float?>(18);
+            obj.RTN_INDX = DeserializeValue<ushort[]>(19);
+            obj.ORIG_RTN_INDX = info.GetValue<ushort[]>(19);
+            obj.UNITS = DeserializeValue<string>(20);
+            obj.ORIG_UNITS = info.GetValue<string>(20);
+            obj.UNITS_IN = DeserializeValue<string>(21);
+            obj.ORIG_UNITS_IN = info.GetValue<string>(21);
+            obj.C_RESFMT = DeserializeValue<string>(22);
+            obj.ORIG_C_RESFMT = info.GetValue<string>(22);
+            obj.C_LLMFMT = DeserializeValue<string>(23);
+            obj.ORIG_C_LLMFMT = info.GetValue<string>(23);
+            obj.C_HLMFMT = DeserializeValue<string>(24);
+            obj.ORIG_C_HLMFMT = info.GetValue<string>(24);
+            obj.LO_SPEC = DeserializeValue<float?>(25);
+            obj.ORIG_LO_SPEC = info.GetValue<float?>(25);
+            obj.HI_SPEC = DeserializeValue<float?>(26);
+            obj.ORIG_HI_SPEC = info.GetValue<float?>(26);
 
             SetOptionalFlags(obj);
-
-            // set the original value fields for later serialization logic
 
             AddDefaults();
         }
