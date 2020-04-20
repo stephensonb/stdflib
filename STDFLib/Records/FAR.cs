@@ -5,10 +5,11 @@
     /// </summary>
     public class FAR : STDFRecord
     {
-        public FAR() : base(RecordTypes.FAR, "File Attribute Record") { }
+        public FAR() : base(RecordTypes.FAR)
+        {
+        }
 
-        [STDF] public byte CPU_TYPE { get; set; } = (byte)STDFCpuTypes.i386;  // Default Intel CPU
-
-        [STDF] public byte STDF_VER { get; set; } = (byte)STDFVersions.STDFVer4; // Version 4 of the standard
+        [STDF] public byte CPU_TYPE = 0;  // Default Intel CPU
+        [STDF] public byte STDF_VER = 0;
     }
 }

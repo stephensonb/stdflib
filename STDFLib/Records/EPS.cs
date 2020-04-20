@@ -5,6 +5,12 @@
     /// </summary>
     public class EPS : STDFRecord
     {
-        public EPS() : base(RecordTypes.EPS, "End Program Section") { }
+        public EPS() : base(RecordTypes.EPS)
+        {
+        }
+        public override string ToString()
+        {
+            return "***** End Sequence *****";
+        }
     }
 }

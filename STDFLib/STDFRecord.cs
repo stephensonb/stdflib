@@ -1,41 +1,22 @@
-﻿using System.Collections;
-using System.Linq;
-using System.Text;
-using System.Reflection;
-using System.Collections.Generic;
-
-namespace STDFLib
+﻿namespace STDFLib
 {
+    /// <summary>
+    /// Abstract base class for STDF record classes.
+    /// </summary>
     public abstract class STDFRecord : ISTDFRecord
     {
-        public static Dictionary<object, ISTDFRecord> RecordDefaults = new Dictionary<object, ISTDFRecord>();
+        /// <summary>
+        /// Length of the record in the file on disk in byte.
+        /// </summary>
+        public ushort RecordLength { get; set; }
+        /// <summary>
+        /// Record type code, two bytes.  Byte 1 is the record type, byte 2 is the record sub type.
+        /// </summary>
+        public ushort RecordType { get; protected set; }
 
-        // This base class is for records conforming to Version 4.0 of the STDF specification.
-        public STDFVersions Version { get; } = STDFVersions.STDFVer4;
-
-        // public fields
-        public RecordType RecordType { get; } = 0;
-        public string Description { get; } = "";
-
-        public STDFRecord()
+        protected STDFRecord(RecordTypes recordTypeCode)
         {
-        }
-
-        public STDFRecord(RecordType recordType, string description)
-        {
-            RecordType = recordType;
-            Description = description;
-        }
-
-        public virtual int GetItemCount(string propertyName)
-        {
-            switch (propertyName)
-            {
-                //              case "prop1": return prop1;
-                //              case "prop2": return prop2;
-                default: return -1;
-            }
+            RecordType = (ushort)recordTypeCode;
         }
     }
 }
-

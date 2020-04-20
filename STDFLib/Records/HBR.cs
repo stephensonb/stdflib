@@ -1,47 +1,24 @@
-﻿using System;
-
-namespace STDFLib
+﻿namespace STDFLib
 {
     /// <summary>
     /// Hard Bin Record
     /// </summary>
-    public class HBR : STDFRecord
+    public class HBR : STDFRecord, ITestBin
     {
-        private char _hbin_pf = ' ';
+        public HBR() : base(RecordTypes.HBR) { }
 
-        public HBR() : base(RecordTypes.HBR, "Hard Bin Record") { }
+        [STDF] public byte HEAD_NUM = 1;
+        [STDF] public byte SITE_NUM = 1;
+        [STDF] public ushort HBIN_NUM = 0;
+        [STDF] public uint HBIN_CNT = 0;
+        [STDF] public char HBIN_PF = ' ';
+        [STDF] public string HBIN_NAM = "";
 
-        [STDF] public byte HEAD_NUM { get; set; } = 0xFF;
-
-        [STDF] public byte SITE_NUM { get; set; } = 0x01;
-
-        [STDF] public ushort HBIN_NUM { get; set; } = 0;
-
-        [STDF] public uint HBIN_CNT { get; set; } = 0;
-
-        [STDF] public char HBIN_PF
-        {
-            get => _hbin_pf;
-
-            set
-            {
-                switch(char.ToUpper(value))
-                {
-                    case 'Y':
-                    case 'N':
-                    case ' ':
-                        _hbin_pf = value;
-                        break;
-                    case '\0':
-                        _hbin_pf = ' ';
-                        break;
-                    default:
-                        throw new ArgumentException(string.Format("Unsupported Hard Bin Pass/Fail value (HBIN_PF) value passed.  Valid values are Y, N or a space.  Value received was '{0}'.", value));
-                }
-            }
-        }
-
-        [STDF] public string HBIN_NAM { get; set; }
+        byte ITestBin.HEAD_NUM { get => HEAD_NUM; set => HEAD_NUM = value; }
+        byte ITestBin.SITE_NUM { get => SITE_NUM; set => SITE_NUM = value; }
+        ushort ITestBin.BIN_NUM { get => HBIN_NUM; set => HBIN_NUM = value; }
+        uint ITestBin.BIN_CNT { get => HBIN_CNT; set => HBIN_CNT = value; }
+        char ITestBin.BIN_PF { get => HBIN_PF; set => HBIN_PF = value; }
+        string ITestBin.BIN_NAM { get => HBIN_NAM; set => HBIN_NAM = value; }
     }
-
 }

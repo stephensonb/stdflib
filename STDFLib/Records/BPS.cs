@@ -3,10 +3,15 @@
     /// <summary>
     /// Begin Program Segment record
     /// </summary>
-    public class BPS : STDFRecord
+    public partial class BPS : STDFRecord
     {
-        public BPS() : base(RecordTypes.BPS, "Begin Program Section") { }
+        public BPS() : base(RecordTypes.BPS) { }
 
-        [STDF] public string SEQ_NAME { get; set; } = "";
+        [STDF] public string SEQ_NAME = "";
+
+        public override string ToString()
+        {
+            return "***** Begin Sequence " + SEQ_NAME + " *****";
+        }
     }
 }

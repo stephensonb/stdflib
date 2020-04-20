@@ -7,10 +7,9 @@ namespace STDFLib
     /// </summary>
     public class ATR : STDFRecord
     {
-        public ATR() : base(RecordTypes.ATR, "Audit Trail Record") { }
+        public ATR() : base(RecordTypes.ATR) { }
 
-        [STDF] public DateTime MOD_TIM { get; set; } = DateTime.Now;
-
-        [STDF] public string CMD_LINE { get; set; } = "";
+        [STDF] public DateTime MOD_TIM;
+        [STDF] public string CMD_LINE = "";
     }
 }

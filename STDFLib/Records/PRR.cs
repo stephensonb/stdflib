@@ -1,55 +1,28 @@
-﻿using System;
-
-namespace STDFLib
+﻿namespace STDFLib
 {
     /// <summary>
     /// Part Results Record
     /// </summary>
     public class PRR : STDFRecord
     {
-        private byte _prt_flg = 0;
+        public PRR() : base(RecordTypes.PRR) { }
 
-        public PRR() : base(RecordTypes.PRR, "Part Results Record") { }
+        [STDF] public byte HEAD_NUM = 1;
+        [STDF] public byte SITE_NUM = 1;
+        [STDF] public byte PART_FLG = 0;
+        [STDF] public ushort NUM_TEST;
+        [STDF] public ushort HARD_BIN;
+        [STDF] public ushort SOFT_BIN = 0xFFFF;
+        [STDF] public short X_COORD = -32768;
+        [STDF] public short Y_COORD = -32768;
+        [STDF] public uint? TEST_T;
+        [STDF] public string PART_ID = "";
+        [STDF] public string PART_TXT = "";
+        [STDF] public ByteArray PART_FIX;
 
-        [STDF] public byte HEAD_NUM { get; set; } = 0x01;
-
-        [STDF] public byte SITE_NUM { get; set; } = 0x01;
-
-        [STDF] public byte PART_FLG
+        public override string ToString()
         {
-            get => _prt_flg;
-
-            set
-            {
-                // Test if both bits 0 and 1 are set (1)
-                if ((value & 0b00000011) > 0)
-                {
-                    throw new ArgumentException("Retest flags for PART_ID and XCOORD/YCOORD cannot both be set (bits 0 and 1).");
-                }
-
-                if ((value & 0b11100000) > 0)
-                {
-                    throw new ArgumentException("Part flag bits 5 through 7 are reserved and must be set to 0.");
-                }
-            }
+            return string.Format("** Part Result {0},{1},{2},{3}", HEAD_NUM, SITE_NUM, PART_ID, PART_TXT);
         }
-
-        [STDF] public ushort NUM_TEST { get; set; } = 0;
-
-        [STDF] public ushort HARD_BIN { get; set; } = 0;
-
-        [STDF] public ushort SOFT_BIN { get; set; } = 0xFFFF;
-
-        [STDF] public short X_COORD { get; set; } = -32768;
-
-        [STDF] public short Y_COORD { get; set; } = -32768;
-
-        [STDF] public uint TEST_T { get; set; } = 0;
-
-        [STDF] public string PART_ID { get; set; } = "";
-
-        [STDF] public string PART_TXT { get; set; } = "";
-
-        [STDF] public BitField PART_FIX { get; set; } = new BitField();
     }
 }

@@ -5,77 +5,56 @@
     /// </summary>
     public class MPR : STDFRecord
     {
-        public MPR() : base(RecordTypes.MPR, "Multiresult Parametric Record") { }
+        public MPR() : base(RecordTypes.MPR) { }
 
-        [STDF] public uint TEST_NUM { get; set; } = 0xFFFFFFFF;
+        [STDF] public uint TEST_NUM = 0;
+        [STDF] public byte HEAD_NUM = 1;
+        [STDF] public byte SITE_NUM = 1;
+        [STDF] public byte TEST_FLG = (byte)TestResultFlags.InvalidResult;
+        [STDF] public byte PARM_FLG = (byte)TestParameterFlags.AllBitsZero;
+        [STDF] public ushort RTN_ICNT = 0;
+        [STDF] public ushort RSLT_CNT = 0;
+        [STDF("RTN_ICNT")] public byte[] RTN_STAT;
+        [STDF("RSLT_CNT")] public float[] RTN_RSLT;
+        [STDF] public string TEST_TXT = "";
+        [STDF] public string ALARM_ID = "";
+        [STDFOptional] public byte OPT_FLAG = 0;
+        [STDFOptional] public sbyte? RES_SCAL;
+        [STDFOptional] public sbyte? LLM_SCAL;
+        [STDFOptional] public sbyte? HLM_SCAL;
+        [STDFOptional] public float? LO_LIMIT;
+        [STDFOptional] public float? HI_LIMIT;
+        [STDFOptional] public float? START_IN;
+        [STDFOptional] public float? INCR_IN;
+        [STDFOptional("RTN_ICNT")] public ushort[] RTN_INDX;
+        [STDFOptional] public string UNITS = "";
+        [STDFOptional] public string UNITS_IN = "";
+        [STDFOptional] public string C_RESFMT = "";
+        [STDFOptional] public string C_LLMFMT = "";
+        [STDFOptional] public string C_HLMFMT = "";
+        [STDFOptional] public float? LO_SPEC;
+        [STDFOptional] public float? HI_SPEC;
 
-        [STDF] public byte HEAD_NUM { get; set; } = 0x01;
+        // non-serialized fields used for serialization logic
+        public sbyte? ORIG_RES_SCAL;
+        public sbyte? ORIG_LLM_SCAL;
+        public sbyte? ORIG_HLM_SCAL;
+        public float? ORIG_LO_LIMIT;
+        public float? ORIG_HI_LIMIT;
+        public float? ORIG_START_IN;
+        public float? ORIG_INCR_IN;
+        public ushort[] ORIG_RTN_INDX;
+        public string ORIG_UNITS;
+        public string ORIG_UNITS_IN;
+        public string ORIG_C_RESFMT;
+        public string ORIG_C_LLMFMT;
+        public string ORIG_C_HLMFMT;
+        public float? ORIG_LO_SPEC;
+        public float? ORIG_HI_SPEC;
 
-        [STDF] public byte SITE_NUM { get; set; } = 0x01;
-
-        [STDF] public byte TEST_FLG { get; set; } = (byte)TestResultFlags.InvalidResult;
-
-        [STDF] public byte PARM_FLG { get; set; } = 0;
-
-        [STDF] public ushort RTN_ICNT
+        public override string ToString()
         {
-            get => (ushort)RTN_STAT.Count;
-
-            set
-            {
-                RTN_STAT.Clear();
-                RTN_STAT.AddRange(new byte[value]);
-            }
+            return string.Format("** Test# {0},{1},{2},{3}", TEST_NUM, HEAD_NUM, SITE_NUM, "Multiresult Parametric");
         }
-
-        [STDF] public ushort RSLT_CNT
-        {
-            get => (ushort)RTN_RSLT.Length;
-
-            set
-            {
-                RTN_RSLT = new float[value];
-            }
-        }
-
-        [STDF("RTN_ICNT")] public Nibbles RTN_STAT { get; set; } = new Nibbles();
-
-        [STDF("RSLT_CNT")] public float[] RTN_RSLT { get; set; } = new float[] { };
-
-        [STDF] public string TEST_TXT { get; set; } = "";
-
-        [STDF] public string ALARM_ID { get; set; } = "";
-
-        [STDF] public byte OPT_FLAG { get; set; } = 0;
-
-        [STDF] public sbyte RES_SCAL { get; set; } = 0;
-
-        [STDF] public sbyte LLM_SCAL { get; set; } = 0;
-
-        [STDF] public sbyte HLM_SCAL { get; set; } = 0;
-
-        [STDF] public float LO_LIMIT { get; set; } = 0;
-
-        [STDF] public float HI_LIMIT { get; set; } = 0;
-
-        [STDF] public float START_IN { get; set; } = 0;
-
-        [STDF] public float INCR_IN { get; set; } = 0;
-
-        [STDF("RTN_ICNT")] public ushort[] RTN_INDX { get; set; } = new ushort[] { };
-
-        [STDF] public string UNITS { get; set; } = "";
-
-        [STDF] public string UNITS_IN { get; set; } = "";
-
-        [STDF] public string C_RESFMT { get; set; } = "";
-
-        [STDF] public string C_LLMFMT { get; set; } = "";
-
-        [STDF] public string C_HLMFMT { get; set; } = "";
-
-        [STDF] public float LO_SPEC { get; set; } = 0;
-
-        [STDF] public float HI_SPEC { get; set; } = 0;
     }
 }
