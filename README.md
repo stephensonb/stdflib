@@ -6,13 +6,11 @@ The current version reads and writes STDF files conforming to Version 4 of the S
 
 # Basic Usage
 
----
-
 - Clone the repository and build the library (latest build using Visual Studio 19).
 - Include the built library into your project and add a reference to it.
 - Sample code to read a file as a list of records:
 
-  ### _Note: The **STDFRecordFormatter** class implements the IDisposable interface. Use with 'using' to auto release managed resources when we go out of scope at the end of the enclosing block._
+  _Note: The **STDFRecordFormatter** class implements the IDisposable interface. Use with 'using' to auto release managed resources when we go out of scope at the end of the enclosing block._
 
 ```csharp
 public IEnumerable<ISTDFRecord> ReadFile(string path)
