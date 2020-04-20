@@ -117,16 +117,16 @@ namespace STDFLibUnitTest
         {
 
             Console.WriteLine(System.IO.Directory.GetCurrentDirectory());
-            string filePath = "../../a595.stdf";
+            string filePath = "../../../a595.stdf";
             IEnumerable<ISTDFRecord> records = ReadFile(filePath);
             Assert.IsTrue(records.Count() == 40651);
 
-            filePath = "../../lot2.stdf";
+            filePath = "../../../lot2.stdf";
             records = ReadFile(filePath);
             Assert.IsTrue(records.Count() == 58020);
            
 
-            filePath = "../../lot3.stdf";
+            filePath = "../../../lot3.stdf";
             records = ReadFile(filePath);
             Assert.IsTrue(records.Count() == 59890);
         }
@@ -134,21 +134,21 @@ namespace STDFLibUnitTest
         [TestMethod]
         public void Write_Output_Files()
         {
-            string filePath = "../../a595.stdf";
-            string outPath = "../../a595-rewrite.stdf";
+            string filePath = "../../../a595.stdf";
+            string outPath = "../../../a595-rewrite.stdf";
             IEnumerable<ISTDFRecord> records = ReadFile(filePath);
             int writeCount = WriteFile(outPath, records);
             Assert.IsTrue(writeCount == 40651);
 
-            filePath = "../../lot2.stdf";
-            outPath = "../../lot2-rewrite.stdf";
+            filePath = "../../../lot2.stdf";
+            outPath = "../../../lot2-rewrite.stdf";
             records = ReadFile(filePath);
             writeCount = WriteFile(outPath, records);
             Assert.IsTrue(writeCount == 58020);
 
 
-            filePath = "../../lot3.stdf";
-            outPath = "../../lot3-rewrite.stdf";
+            filePath = "../../../lot3.stdf";
+            outPath = "../../../lot3-rewrite.stdf";
             records = ReadFile(filePath);
             writeCount = WriteFile(outPath, records);
             Assert.IsTrue(writeCount == 59890);
@@ -157,23 +157,23 @@ namespace STDFLibUnitTest
         [TestMethod]
         public void Compare_Original_And_Rewritten_Files()
         {
-            string filePath = "../../a595.stdf";
-            string outPath = "../../a595-rewrite.stdf";
+            string filePath = "../../../a595.stdf";
+            string outPath = "../../../a595-rewrite.stdf";
             IEnumerable<ISTDFRecord> records = ReadFile(filePath);
             WriteFile(outPath, records);
             int mismatchCount = CompareRecords(outPath, records);
             Assert.IsTrue(mismatchCount == 0);
 
-            filePath = "../../lot2.stdf";
-            outPath = "../../lot2-rewrite.stdf";
+            filePath = "../../../lot2.stdf";
+            outPath = "../../../lot2-rewrite.stdf";
             records = ReadFile(filePath);
             WriteFile(outPath, records);
             mismatchCount = CompareRecords(outPath, records);
             Assert.IsTrue(mismatchCount == 0);
 
 
-            filePath = "../../lot3.stdf";
-            outPath = "../../lot3-rewrite.stdf";
+            filePath = "../../../lot3.stdf";
+            outPath = "../../../lot3-rewrite.stdf";
             records = ReadFile(filePath);
             WriteFile(outPath, records);
             mismatchCount = CompareRecords(outPath, records);
